@@ -149,3 +149,14 @@ exports.deleteAccount = async (req, res) => {
     res.status(500).json({ message: 'Błąd serwera' });
   }
 };
+
+// Wylogowanie użytkownika
+exports.logout = (req, res) => {
+  try {
+    // Wylogowanie polega na poinformowaniu klienta o usunięciu tokenu
+    res.status(200).json({ message: 'Wylogowano pomyślnie!' });
+  } catch (error) {
+    console.error('Błąd wylogowania:', error);
+    res.status(500).json({ message: 'Błąd serwera podczas wylogowania' });
+  }
+};

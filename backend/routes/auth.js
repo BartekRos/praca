@@ -1,10 +1,50 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const { register, login, resetPassword, updateProfile, deleteAccount } = require('../controllers/authController'); // Import funkcji z kontrolera
+const { register, login, resetPassword, updateProfile, deleteAccount, logout } = require('../controllers/authController'); // Import funkcji z kontrolera
 const router = express.Router();
 const { authMiddleware } = require('../middleware/authMiddleware');
+const logActivity = require('../middleware/logActivityMiddleware');
+
+//debugowanie: sorawdzenie typów zaimportowanych funkcji
+console.log('register type:', typeof register);
+console.log('login type:', typeof login);
+console.log('resetPassword type:', typeof resetPassword);
+console.log('updateProfile type:', typeof updateProfile);
+console.log('deleteAccount type:', typeof deleteAccount);
+console.log('logout type:', typeof logout);
 
 // Endpoint rejestracji użytkownika
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Rejestracja nowego użytkownika
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               city:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Użytkownik został zarejestrowany
+ *       400:
+ *         description: Błąd walidacji
+ */
 router.post(
 '/register',
   [
@@ -31,10 +71,41 @@ router.post(
     }
     next(); // Przejdź do kontrolera, jeśli walidacja się powiedzie
   },
-  register
+  logActivity, register
 );
 
 // Endpoint logowania użytkownika
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Logowanie użytkownika
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               city:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Użytkownik został zalogowany
+ *       400:
+ *         description: Błąd walidacji
+ */
 router.post(
   '/login',
   [
@@ -48,10 +119,41 @@ router.post(
     }
     next(); // Przejdź do kontrolera, jeśli walidacja się powiedzie
   },
-  login
+  logActivity, login
 );
 
 //Endpoint resetowania hasła
+/**
+ * @swagger
+ * /api/auth/reset-password:
+ *   post:
+ *     summary: Zmiana hasła użytkownika
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               city:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Użytkownik zmienił hasło
+ *       400:
+ *         description: Błąd walidacji
+ */
 router.post(
   '/reset-password',
   [
@@ -71,6 +173,37 @@ router.post(
 );
 
 //Endpoint aktualizacji profilu
+/**
+ * @swagger
+ * /api/auth/update-profile:
+ *   post:
+ *     summary: Aktualizacja profilu użytkownika
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               city:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Profil został zaktualizowany
+ *       400:
+ *         description: Błąd walidacji
+ */
 router.put(
   '/update-profile',
   [
@@ -88,6 +221,37 @@ router.put(
 );
 
 //Endpoint usuwania konta
+/**
+ * @swagger
+ * /api/auth/delete-account:
+ *   post:
+ *     summary: Usunięcie konta użytkownika
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               city:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Użytkownik został usunięty
+ *       400:
+ *         description: Błąd walidacji
+ */
 router.delete(
   '/delete-account',
   [
@@ -102,5 +266,39 @@ router.delete(
   },
   authMiddleware, deleteAccount
 );
+
+// Endpoint wylogowania użytkownika
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Wylogowanie użytkownika
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               age:
+ *                 type: integer
+ *               city:
+ *                 type: string
+ *               profilePicture:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Użytkownik został wylogowany
+ *       400:
+ *         description: Błąd walidacji
+ */
+router.post('/logout', authMiddleware, logout);
 
 module.exports = router;
