@@ -67,6 +67,7 @@ exports.login = async (req, res) => {
     console.error('Błąd logowania:', error);
     res.status(500).json({ message: 'Błąd serwera' });
   }
+};
 
   //resetowanie hasła
   exports.resetPassword = async (req, res) => {
@@ -93,4 +94,58 @@ exports.login = async (req, res) => {
   }
 };
 
+//aktualizacja profilu
+exports.updateProfile = async (req, res) => {
+  try {
+    const { id } = req.user; // Zakładamy, że id użytkownika jest w tokenie
+    const { city, profilePicture } = req.body;
+
+    // Znalezienie użytkownika
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Użytkownik nie został znaleziony' });
+    }
+
+    // Aktualizacja danych użytkownika
+    if (city) user.city = city;
+    if (profilePicture) user.profilePicture = profilePicture;
+
+    await user.save();
+
+    // Usuń hasło z odpowiedzi
+    const { password, ...userWithoutPassword } = user.toJSON();
+
+    res.status(200).json({ message: 'Profil został zaktualizowany', user: userWithoutPassword });
+  } catch (error) {
+    console.error('Błąd aktualizacji profilu:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+};
+
+// Usuwanie konta z potwierdzeniem hasła
+exports.deleteAccount = async (req, res) => {
+  try {
+    const { id } = req.user; // Zakładamy, że id użytkownika jest w tokenie
+    const { password } = req.body; // Hasło podane przez użytkownika
+
+    // Znalezienie użytkownika
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: 'Użytkownik nie został znaleziony' });
+    }
+
+    // Sprawdzenie poprawności hasła
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Nieprawidłowe hasło' });
+    }
+
+    // Usunięcie konta
+    await user.destroy();
+
+    res.status(200).json({ message: 'Konto zostało trwale usunięte' });
+  } catch (error) {
+    console.error('Błąd usuwania konta:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
 };
