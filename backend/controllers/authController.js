@@ -5,7 +5,8 @@ const User = require('../models/Users'); // Upewnij się, że ścieżka jest pop
 // Rejestracja użytkownika
 exports.register = async (req, res) => {
   try {
-    const { email, password, name, age, city, profilePicture } = req.body;
+    const { email, password, name, age, city} = req.body;
+    const profilePicture = req.file ? `uploads/${req.file.filename}` : null;
 
     // Sprawdzenie, czy użytkownik istnieje
     const userExists = await User.findOne({ where: { email } });
@@ -37,6 +38,7 @@ exports.register = async (req, res) => {
   } catch (error) {
     console.error('Błąd rejestracji:', error);
     res.status(500).json({ message: 'Błąd serwera' });
+    console.log(req.body); // Sprawdź, co przychodzi w żądaniu
   }
 };
 

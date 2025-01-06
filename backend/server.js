@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth'); // Import routingu dla autoryzacji
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const postRoutes = require('./routes/posts');
+const path = require('path');
 
 dotenv.config();
 
@@ -61,4 +62,7 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 app.use('/api/posts', postRoutes);
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

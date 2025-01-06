@@ -8,7 +8,7 @@ const RegisterPage = () => {
     name: '',
     age: '',
     city: '',
-    profilePicture: '',
+    profilePicture: null, // Teraz obsługujemy plik
   });
 
   const handleChange = (e) => {
@@ -16,16 +16,28 @@ const RegisterPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, profilePicture: e.target.files[0] });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const data = new FormData(); // Używamy FormData do przesyłania plików
+    data.append('email', formData.email);
+    data.append('password', formData.password);
+    data.append('name', formData.name);
+    data.append('age', formData.age);
+    data.append('city', formData.city);
+
+    if (formData.profilePicture) {
+      data.append('profilePicture', formData.profilePicture);
+    }
 
     try {
       const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+        body: data,
       });
 
       if (response.ok) {
@@ -36,7 +48,7 @@ const RegisterPage = () => {
           name: '',
           age: '',
           city: '',
-          profilePicture: '',
+          profilePicture: null,
         });
       } else {
         const errorData = await response.json();
@@ -102,14 +114,11 @@ const RegisterPage = () => {
           required
         />
 
-        <label>Zdjęcie profilowe (URL):</label>
+        <label>Zdjęcie profilowe (opcjonalne):</label>
         <input
-          type="text"
+          type="file"
           name="profilePicture"
-          placeholder="Wklej URL do swojego zdjęcia profilowego"
-          value={formData.profilePicture}
-          onChange={handleChange}
-          required
+          onChange={handleFileChange}
         />
 
         <button type="submit">Zarejestruj się</button>
