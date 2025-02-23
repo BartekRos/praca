@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import './styles/RegisterPage.css';
+import cities from '../utils/cities';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -104,16 +105,14 @@ const RegisterPage = () => {
           onChange={handleChange}
           required
         />
-
+        {/* Wybór miasta */}
         <label>Miasto:</label>
-        <input
-          type="text"
-          name="city"
-          placeholder="Wprowadź swoje miasto"
-          value={formData.city}
-          onChange={handleChange}
-          required
-        />
+        <select name="city" value={formData.city} onChange={handleChange} required>
+          <option value="">Wybierz miasto</option>
+          {cities.map((city, index) => (
+            <option key={index} value={city}>{city}</option>
+          ))}
+        </select>
 
         <label>Zdjęcie profilowe (opcjonalne):</label>
         <input

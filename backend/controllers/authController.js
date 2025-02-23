@@ -14,6 +14,7 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: 'Użytkownik już istnieje' });
     }
 
+
     // Hashowanie hasła
     const hashedPassword = await bcrypt.hash(password, 10);
 
