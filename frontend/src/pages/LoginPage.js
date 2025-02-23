@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router';
 import './styles/LoginPage.css';
 
 const LoginPage = () => {
@@ -29,27 +30,30 @@ const LoginPage = () => {
 
   return (
     <div className="login-container">
-      <div className="login-form">
-        <h1>Login Page</h1>
+        <h1>Logowanie</h1>
         <form onSubmit={handleLogin}>
           <label>Email:</label>
           <input
             type="email"
-            placeholder="Enter your email"
+            placeholder="Wprowadź swój email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <label>Password:</label>
+          <label>Hasło:</label>
           <input
             type="password"
-            placeholder="Enter your password"
+            placeholder="Wprowadź swoje hasło"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <button type="submit">Login</button>
         </form>
-      </div>
+        <div className="register-link">
+          <p>Nie masz jeszcze konta?</p>
+          <Link to="/register">Zarejestruj się tutaj</Link>
+        </div>
     </div>
+    
   );
 };
 
