@@ -43,6 +43,22 @@ exports.register = async (req, res) => {
   }
 };
 
+// Walidacja tokenu
+exports.validateToken = (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ valid: false, message: 'Brak tokena' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({ valid: true, userId: decoded.id });
+  } catch (err) {
+    res.status(401).json({ valid: false, message: 'Niepoprawny lub wygasły token' });
+  }
+};
+
 // Logowanie użytkownika
 exports.login = async (req, res) => {
   try {
