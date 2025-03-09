@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
+import Navbar from "../components/Navbar"; // Importujemy navbar
+import "./styles/HomePage.css";
+
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    // Fetch posts from API
     const fetchPosts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/posts');
+        const response = await fetch("http://localhost:5000/api/posts");
         const data = await response.json();
         setPosts(data);
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error("Błąd pobierania postów:", error);
       }
     };
 
@@ -19,17 +21,31 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Home Page</h1>
-      <ul>
-        {posts.map((post) => (
-          <li key={post.id}>
-            <h2>{post.title}</h2>
-            <p>{post.content}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <Navbar /> {/* Navbar zawsze na górze */}
+      <div className="homepage-container">
+        <h2 className="title"> </h2>
+        <div className="posts-container">
+          {posts.map((post) => (
+            <div key={post.id} className="post">
+              <div className="post-header">
+                <img
+                  src={post.User?.profilePicture || "/default-profile.jpg"}
+                  alt="Profil"
+                  className="profile-pic"
+                />
+                <span>{post.User?.name || "Anonimowy użytkownik"}</span>
+              </div>
+              <h3 className="post-title">{post.title}</h3>
+              <p className="post-meta">
+                Miejsce: {post.country} | Data: {post.travelDate} | Cena: {post.priceFrom} - {post.priceTo} PLN
+              </p>
+              <button className="expand-btn">Zobacz więcej</button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   );
 };
 
