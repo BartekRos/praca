@@ -7,10 +7,12 @@ const router = express.Router();
 // Pobranie wszystkich aktywnych postów
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.findAll({ where: { isActive: true } });
+    const posts = await Post.findAll({ where: { isActive: true }, include: ["User"] });
+    console.log("Pobrane posty:", posts);
     res.json(posts);
   } catch (error) {
-    res.status(500).json({ message: "Błąd serwera" });
+    console.error("Błąd pobierania postów:", error);
+    res.status(500).json({ message: "Błąd serwera", error: error.message });
   }
 });
 

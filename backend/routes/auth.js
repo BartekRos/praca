@@ -6,7 +6,6 @@ const { authMiddleware } = require('../middleware/authMiddleware');
 const logActivity = require('../middleware/logActivityMiddleware');
 const multer = require('multer');
 const path = require('path');
-const { validateToken } = require('../controllers/authController');
 const db = require('../config/db'); // Twój plik konfiguracyjny z połączeniem do MySQL
 const cities = [
 "Aleksandrów Kujawski",
@@ -1170,6 +1169,5 @@ router.delete(
  *         description: Błąd walidacji
  */
 router.post('/logout', authMiddleware, logout);
-router.post('/validate-token', validateToken);
 
 module.exports = router;

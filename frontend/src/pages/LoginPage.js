@@ -6,29 +6,31 @@ import './styles/LoginPage.css';
 
 const LoginPage = () => {
   const { login } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error('Nieprawidłowy e-mail lub hasło');
+        throw new Error(data.message || "Błąd logowania");
       }
 
-      const data = await response.json();
-      login(data.user, data.token); // Zapisanie użytkownika w kontekście
-      navigate('/'); // Przekierowanie na stronę główną
+      login(data.user, data.token);
+      navigate("/");
     } catch (error) {
-      alert(error.message);
+      console.error("Błąd logowania:", error);
+      alert("Nie udało się zalogować.");
     }
   };
 

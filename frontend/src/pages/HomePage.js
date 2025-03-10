@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components/Navbar"; // Importujemy navbar
+import Navbar from "../components/Navbar";
 import "./styles/HomePage.css";
-
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
@@ -11,6 +10,13 @@ const HomePage = () => {
       try {
         const response = await fetch("http://localhost:5000/api/posts");
         const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          console.error("Błędny format danych:", data);
+          setPosts([]); // Jeśli format nie jest poprawny, ustaw pustą tablicę
+          return;
+        }
+
         setPosts(data);
       } catch (error) {
         console.error("Błąd pobierania postów:", error);
@@ -22,28 +28,32 @@ const HomePage = () => {
 
   return (
     <>
-      <Navbar /> {/* Navbar zawsze na górze */}
+      <Navbar />
       <div className="homepage-container">
-        <h2 className="title"> </h2>
-        <div className="posts-container">
-          {posts.map((post) => (
-            <div key={post.id} className="post">
-              <div className="post-header">
-                <img
-                  src={post.User?.profilePicture || "/default-profile.jpg"}
-                  alt="Profil"
-                  className="profile-pic"
-                />
-                <span>{post.User?.name || "Anonimowy użytkownik"}</span>
+        <h2 className="title">Posty użytkowników</h2>
+        {posts.length === 0 ? (
+          <p>Brak dostępnych postów</p>
+        ) : (
+          <div className="posts-container">
+            {posts.map((post) => (
+              <div key={post.id} className="post">
+                <div className="post-header">
+                  <img
+                    src={post.User?.profilePicture || "/default-profile.jpg"}
+                    alt="Profil"
+                    className="profile-pic"
+                  />
+                  <span>{post.User?.name || "Anonimowy użytkownik"}</span>
+                </div>
+                <h3 className="post-title">{post.title}</h3>
+                <p className="post-meta">
+                  Miejsce: {post.country} | Data: {post.travelDate} | Cena: {post.priceFrom} - {post.priceTo} PLN
+                </p>
+                <button className="expand-btn">Zobacz więcej</button>
               </div>
-              <h3 className="post-title">{post.title}</h3>
-              <p className="post-meta">
-                Miejsce: {post.country} | Data: {post.travelDate} | Cena: {post.priceFrom} - {post.priceTo} PLN
-              </p>
-              <button className="expand-btn">Zobacz więcej</button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

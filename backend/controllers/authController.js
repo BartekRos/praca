@@ -43,22 +43,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Walidacja tokenu
-exports.validateToken = (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).json({ valid: false, message: 'Brak tokena' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    res.status(200).json({ valid: true, userId: decoded.id });
-  } catch (err) {
-    res.status(401).json({ valid: false, message: 'Niepoprawny lub wygasły token' });
-  }
-};
-
 // Logowanie użytkownika
 exports.login = async (req, res) => {
   try {
@@ -67,24 +51,31 @@ exports.login = async (req, res) => {
     // Znalezienie użytkownika
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      return res.status(400).json({ message: 'Nieprawidłowy e-mail lub hasło' });
+      return res.status(400).json({ message: "Nieprawidłowy e-mail lub hasło" });
     }
 
     // Sprawdzenie hasła
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Nieprawidłowy e-mail lub hasło' });
+      return res.status(400).json({ message: "Nieprawidłowy e-mail lub hasło" });
     }
 
     // Generowanie tokenu JWT
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+      expiresIn: "7d",
     });
 
-    res.status(200).json({ message: 'Logowanie zakończone sukcesem!', token });
+    // Usunięcie hasła z odpowiedzi
+    const { password: _, ...userWithoutPassword } = user.toJSON();
+
+    res.status(200).json({
+      message: "Logowanie zakończone sukcesem!",
+      token,
+      user: userWithoutPassword, // Dodajemy użytkownika do odpowiedzi
+    });
   } catch (error) {
-    console.error('Błąd logowania:', error);
-    res.status(500).json({ message: 'Błąd serwera' });
+    console.error("Błąd logowania:", error);
+    res.status(500).json({ message: "Błąd serwera" });
   }
 };
 
