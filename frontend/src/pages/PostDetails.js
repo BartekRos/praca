@@ -5,42 +5,48 @@ import "./styles/PostDetails.css";
 const PostDetails = () => {
   const { id } = useParams();
   const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const response = await fetch(`http://localhost:5000/api/posts/${id}`);
+
+        if (!response.ok) {
+          throw new Error("Błąd pobierania posta");
+        }
+
         const data = await response.json();
         setPost(data);
       } catch (error) {
         console.error("Błąd pobierania posta:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPost();
   }, [id]);
 
-  if (!post) return <p>Ładowanie...</p>;
+  if (loading) return <p>Ładowanie...</p>;
+  if (!post) return <p>Nie znaleziono posta</p>;
 
   return (
     <div className="post-details-container">
-      <h1>{post.title}</h1>
-      <div className="post-info">
-        <img
-          src={post.User.profilePicture || "/default-avatar.png"}
-          alt="Profil"
-          className="profile-pic"
-        />
-        <span>{post.User.name}</span>
+      <div className="post-details-card">
+        <h2>{post.title}</h2>
+        <p><strong>Opis:</strong> {post.description}</p>
+        <p><strong>Kraj:</strong> {post.country}</p>
+        <p><strong>Data wyjazdu:</strong> {post.travelDate}</p>
+        <p><strong>Czas trwania:</strong> {post.duration} dni</p>
+        <p><strong>Cena:</strong> {post.priceFrom} - {post.priceTo} PLN</p>
+        <p><strong>Liczba miejsc:</strong> {post.maxPeople}</p>
+        
+        <div className="post-author">
+          <img src={post.User?.profilePicture || "/default-profile.jpg"} alt="Profil" />
+          <strong>{post.User?.name || "Anonimowy użytkownik"}</strong>
+        </div>
       </div>
-      <p><strong>Opis podróży:</strong> {post.description}</p>
-      <p><strong>Kierunek:</strong> {post.country}</p>
-      <p><strong>Data wyjazdu:</strong> {post.travelDate}</p>
-      <p><strong>Długość podróży:</strong> {post.duration} dni</p>
-      <p><strong>Cena:</strong> {post.priceFrom} - {post.priceTo} PLN</p>
-      <p><strong>Maks. liczba osób:</strong> {post.maxPeople}</p>
-
-      <button className="contact-btn">Napisz do organizatora</button>
     </div>
   );
 };

@@ -16,6 +16,22 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Pobranie pojedynczego posta
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await Post.findByPk(req.params.id, { include: ["User"] });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post nie znaleziony" });
+    }
+
+    res.json(post);
+  } catch (error) {
+    console.error("Błąd pobierania posta:", error);
+    res.status(500).json({ message: "Błąd serwera", error: error.message });
+  }
+});
+
 // Pobranie postów danego użytkownika
 router.get("/my-posts", authMiddleware, async (req, res) => {
   try {

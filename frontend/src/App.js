@@ -19,6 +19,7 @@ const App = () => {
           {/* Zabezpieczona trasa dla HomePage */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/post/:id" element={<PostDetails />} />
           </Route>
         </Routes>
       </Router>

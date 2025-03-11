@@ -36,5 +36,20 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Większy cień */
 }
 
+.add-post-btn {
+  padding: 10px 20px;
+  background-color: #646566;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add-post-btn:hover {
+  transform: scale(1.05); /* Powiększenie postu o 5% */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Większy cień */
+}
 
   

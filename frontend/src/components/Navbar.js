@@ -1,32 +1,36 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import AuthContext from "../context/AuthContext"; // Pobieramy dane użytkownika
+import AddPostModal from "./AddPostModal"; // Importujemy nowy komponent
 import "./styles/Navbar.css";
 
 const Navbar = () => {
-  const { user } = useContext(AuthContext); // Pobieramy zalogowanego użytkownika
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <nav className="navbar">
-      <div className="nav-left">
-        <h2>TravelConnect</h2>
-      </div>
-      <div className="nav-center">
-        <input type="text" placeholder="Szukaj podróży..." />
-      </div>
-      <div className="nav-right">
-      <Link to="/messages">
-          <span className="icon">🔔</span>
-        </Link>
-        <Link to="/profile">
-          <img
-            src={user?.profilePicture || "/default-profile.png"} // Jeśli użytkownik ma zdjęcie, używamy jego, w przeciwnym razie domyślne
-            alt="Profil"
-            className="profile-icon"
-          />
-        </Link>
-      </div>
-    </nav>
+    <>
+      <nav className="navbar">
+        <div className="nav-left">
+          <h2>TravelConnect</h2>
+        </div>
+
+        <div className="nav-center">
+          <button className="add-post-btn" onClick={() => setIsModalOpen(true)}>
+            + Dodaj post
+          </button>
+        </div>
+
+        <div className="nav-right">
+          <Link to="/profile">
+            <img src="/default-profile.png" alt="Profil" className="profile-icon" />
+          </Link>
+          <Link to="/messages">
+            <span className="icon">🔔</span>
+          </Link>
+        </div>
+      </nav>
+
+      {isModalOpen && <AddPostModal closeModal={() => setIsModalOpen(false)} />}
+    </>
   );
 };
 
