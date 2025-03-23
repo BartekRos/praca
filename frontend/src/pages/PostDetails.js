@@ -43,7 +43,9 @@ const PostDetails = () => {
         <p><strong>Liczba miejsc:</strong> {post.maxPeople}</p>
         
         <div className="post-author">
-          <img src={post.User?.profilePicture || "/default-profile.jpg"} alt="Profil" />
+          <img
+            src={`http://localhost:5000/uploads/${post.User?.profilePicture || 'default-profile.jpg'}`}
+            alt="Profil" />
           <strong>{post.User?.name || "Anonimowy użytkownik"}</strong>
         </div>
       </div>

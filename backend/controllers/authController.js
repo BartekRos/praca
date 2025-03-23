@@ -6,7 +6,8 @@ const User = require('../models/Users'); // Upewnij się, że ścieżka jest pop
 exports.register = async (req, res) => {
   try {
     const { email, password, name, age, city} = req.body;
-    const profilePicture = req.file ? `uploads/${req.file.filename}` : null;
+    const profilePicture = req.file ? req.file.filename : null;
+
 
     // Sprawdzenie, czy użytkownik istnieje
     const userExists = await User.findOne({ where: { email } });

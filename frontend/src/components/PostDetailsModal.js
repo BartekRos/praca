@@ -18,10 +18,12 @@ const PostDetailsModal = ({ post, onClose }) => {
         <p><strong>Data wyjazdu:</strong> {post.travelDate}</p>
         <p><strong>Czas trwania:</strong> {post.duration} dni</p>
         <p><strong>Cena:</strong> {post.priceFrom} - {post.priceTo} PLN</p>
-        <p><strong>Liczba miejsc:</strong> {post.maxPeople}</p>
+        <p><strong>Liczba wolnych miejsc:</strong> {post.maxPeople}</p>
         
         <div className="post-author">
-          <img src={post.User?.profilePicture || "/default-profile.jpg"} alt="Profil" />
+        <img
+            src={`http://localhost:5000/uploads/${post.User?.profilePicture || 'default-profile.jpg'}`}
+            alt="Profil" />
           <strong>{post.User?.name || "Anonimowy użytkownik"}</strong>
         </div>
       </div>
