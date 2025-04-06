@@ -7,6 +7,7 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    username: '',
     name: '',
     age: '',
     city: '',
@@ -28,6 +29,7 @@ const RegisterPage = () => {
     const data = new FormData(); // Używamy FormData do przesyłania plików
     data.append('email', formData.email);
     data.append('password', formData.password);
+    data.append('username', formData.username);
     data.append('name', formData.name);
     data.append('age', formData.age);
     data.append('city', formData.city);
@@ -47,6 +49,7 @@ const RegisterPage = () => {
         setFormData({
           email: '',
           password: '',
+          username: '',
           name: '',
           age: '',
           city: '',
@@ -85,7 +88,16 @@ const RegisterPage = () => {
           onChange={handleChange}
           required
         />
-
+        <label>Nazwa użytkownika:</label>
+        <input
+          type="text"
+          name="username"
+          placeholder="Wprowadź swoją unikalną nazwę użytkownika"
+          value={formData.username}
+          onChange={handleChange}
+          required
+        />
+       
         <label>Imię:</label>
         <input
           type="text"

@@ -11,8 +11,8 @@ const Post = sequelize.define("Post", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
-  country: {
-    type: DataTypes.STRING,
+  locationData: {
+    type: DataTypes.JSON,
     allowNull: false,
   },
   travelDate: {

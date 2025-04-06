@@ -1,6 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Link } from "react-router-dom";
-import AddPostModal from "./AddPostModal";
+import { NavLink, useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import "./styles/Navbar.css";
 
@@ -9,67 +8,72 @@ import planeIcon from "../assets/icons/plane.svg";
 import cameraIcon from "../assets/icons/camera.svg";
 import friendsIcon from "../assets/icons/friends.svg";
 
-const Navbar = ({ activeTab, setActiveTab }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { user } = useContext(AuthContext);
+const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
+    logout(); // czyści token i usera
+    navigate("/login");
   };
+
   return (
-    <>
-      <nav className="navbar">
+    
+    <nav className="navbar">
       <div className="nav-left">
-        <h2>Poland Travelers</h2>
+          <h2>Poland Travelers</h2>
       </div>
 
       <div className="nav-center">
         <div className="nav-tabs">
-          <button
-            className={`tab-icon-wrapper ${activeTab === "searching" ? "active" : ""}`}
-            onClick={() => setActiveTab("searching")}
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `tab-icon-wrapper ${isActive ? "active" : ""}`
+            }
           >
             <img src={planeIcon} alt="Szukam osób" className="tab-icon" />
-          </button>
-          <button
-            className={`tab-icon-wrapper ${activeTab === "trips" ? "active" : ""}`}
-            onClick={() => setActiveTab("trips")}
+          </NavLink>
+
+          <NavLink
+            to="/trips"
+            className={({ isActive }) =>
+              `tab-icon-wrapper ${isActive ? "active" : ""}`
+            }
           >
             <img src={cameraIcon} alt="Podróże" className="tab-icon" />
-          </button>
-          <button
-            className={`tab-icon-wrapper ${activeTab === "friends" ? "active" : ""}`}
-            onClick={() => setActiveTab("friends")}
+          </NavLink>
+
+          <NavLink
+            to="/friends"
+            className={({ isActive }) =>
+              `tab-icon-wrapper ${isActive ? "active" : ""}`
+            }
           >
             <img src={friendsIcon} alt="Znajomi" className="tab-icon" />
-          </button>
+          </NavLink>
         </div>
       </div>
 
       <div className="nav-right">
         <div className="profile-menu-wrapper">
-              <img
-          src={`http://localhost:5000/uploads/${user?.profilePicture || 'default-profile.jpg'}`}
-          alt="Profil"
-          className={`profile-icon ${isDropdownOpen ? "active" : ""}`}
-          onClick={() => setIsDropdownOpen((prev) => !prev)}
-        />
-
-        {isDropdownOpen && (
-          <div className="dropdown-menu">
-            <Link to="/profile" className="dropdown-item">Profil</Link>
-            <Link to="/messages" className="dropdown-item">Wiadomości</Link>
-            <button onClick={handleLogout} className="dropdown-item">Wyloguj się</button>
-          </div>
-        )}
-      </div>
+          <img
+            onClick={() => setIsDropdownOpen((prev) => !prev)}
+            src={`http://localhost:5000/uploads/${user?.profilePicture || "default-profile.jpg"}`}
+            alt="Profil"
+            className={`profile-icon ${isDropdownOpen ? "active" : ""}`}
+          />
+          {isDropdownOpen && (
+            <div className="dropdown-menu">
+              <NavLink to="/profile" className="dropdown-item">Profil</NavLink>
+              <NavLink to="/messages" className="dropdown-item">Wiadomości</NavLink>
+              <button onClick={handleLogout} className="dropdown-item">Wyloguj się</button>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
-
-      {isModalOpen && <AddPostModal closeModal={() => setIsModalOpen(false)} />}
-    </>
   );
 };
 

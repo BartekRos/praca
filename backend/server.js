@@ -8,6 +8,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const postRoutes = require("./routes/post");
 const path = require('path');
+require('./models/Users');
+require('./models/Post');
+require('./models/UserActivity');
 
 dotenv.config();
 
@@ -66,3 +69,4 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 app.use("/api/posts", postRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+

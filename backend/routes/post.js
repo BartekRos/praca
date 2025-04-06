@@ -1,6 +1,7 @@
 const express = require("express");
 const { authMiddleware } = require("../middleware/authMiddleware");
 const Post = require("../models/Post");
+const User = require("../models/Users");
 
 const router = express.Router();
 
@@ -45,7 +46,8 @@ router.get("/my-posts", authMiddleware, async (req, res) => {
 // Dodanie nowego posta
 router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { title, description, country, travelDate, duration, priceFrom, priceTo, maxPeople } = req.body;
+    const { title, description, locationData, travelDate, duration, priceFrom, priceTo, maxPeople } = req.body;
+    console.log(req.user)
     const userId = req.user.id;
 
     // Sprawdzenie limitu aktywnych postów
@@ -54,13 +56,33 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(400).json({ message: "Możesz mieć maksymalnie 5 aktywnych postów." });
     }
 
-    const newPost = await Post.create({
-      title, description, country, travelDate, duration, priceFrom, priceTo, maxPeople, userId
-    });
+    // Po utworzeniu posta, pobierz go ponownie z include: User i dopiero wtedy zwróć
+const newPost = await Post.create({
+  title,
+  description,
+  locationData,
+  travelDate,
+  duration,
+  priceFrom,
+  priceTo,
+  maxPeople,
+  userId,
+});
 
-    res.status(201).json(newPost);
+// Pobierz nowo utworzony post wraz z użytkownikiem
+const fullPost = await Post.findByPk(newPost.id, {
+  include: {
+    model: User,
+    attributes: ['username', 'profilePicture'],
+  },
+});
+
+res.status(201).json(fullPost);
+
   } catch (error) {
-    res.status(500).json({ message: "Błąd serwera" });
+    console.error("Błąd tworzenia posta:", error.message);
+    console.error(error); // szczegóły błędu
+    res.status(500).json({ message: "Błąd serwera", error });
   }
 });
 

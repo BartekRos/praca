@@ -1,10 +1,11 @@
 .homepage-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-  
+  display: flex;
+  align-items: flex-start;
+  gap: 40px; /* więcej miejsca między przyciskiem a postami */
+  padding: 20px 40px;
+  box-sizing: border-box;
+}
+
   .title {
     font-size: 24px;
     font-weight: bold;
@@ -12,18 +13,22 @@
   }
   
   .posts-container {
-    width: 70%;
+    padding: 50px;
+    width: 80%;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    margin-right: auto;
   }
   
   .post {
     background-color: #fff;
-    padding: 15px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #eee;
+    min-height: 200px;
   }
   
   .post:hover {
@@ -53,16 +58,34 @@
     color: gray;
   }
   
-  .expand-btn {
-    background-color: #646566;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-top: 10px;
-    border-radius: 4px;
+
+  /* Lewa kolumna */
+  .sidebar-left {
+    flex-shrink: 0;
+    width: 160px;
   }
 
-  .expand-btn:hover {
-    background-color: #343435;
-  }
+/* Prawa kolumna z postami */
+.main-content {
+  flex: 1;
+}
+
+/* Przycisk dodawania postu */
+.add-post-sidebar {
+  background-color: #444;
+  color: white;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 80%;
+  text-align: center;
+}
+
+.add-post-sidebar:hover {
+  transform: scale(1.05); /* Powiększenie postu o 5% */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Większy cień */
+  background-color: #333;
+}

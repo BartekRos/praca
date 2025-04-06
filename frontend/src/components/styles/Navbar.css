@@ -43,7 +43,8 @@
 
 .nav-tabs {
   display: flex;
-  gap: 30px;
+  gap: 350px;
+  margin-left: -160px;
 }
 .tab-icon-wrapper {
   background: none;
@@ -111,11 +112,11 @@
   cursor: pointer;
   font-size: 10px;
   transition: font-weight 0.2s ease;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .dropdown-item:hover {
-  font-weight: 600;
+  font-weight: 800;
   color: #000;
 }
 

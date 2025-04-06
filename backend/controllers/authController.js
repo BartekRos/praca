@@ -5,7 +5,7 @@ const User = require('../models/Users'); // Upewnij się, że ścieżka jest pop
 // Rejestracja użytkownika
 exports.register = async (req, res) => {
   try {
-    const { email, password, name, age, city} = req.body;
+    const { email, password, username, name, age, city} = req.body;
     const profilePicture = req.file ? req.file.filename : null;
 
 
@@ -23,6 +23,7 @@ exports.register = async (req, res) => {
     const newUser = await User.create({
       email,
       password: hashedPassword,
+      username,
       name,
       age,
       city,

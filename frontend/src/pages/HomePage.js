@@ -1,71 +1,96 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
+import CreatePostSection from "../components/CreatePostSection";
 import "./styles/HomePage.css";
+
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
-  const [activeTab, setActiveTab] = useState("searching");
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // Fetch postów z backendu
+  const fetchPosts = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/posts");
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        // sortowanie najnowsze na górze
+        const sorted = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setPosts(sorted);
+      }
+    } catch (error) {
+      console.error("Błąd pobierania postów:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/posts");
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setPosts(data);
-        } else {
-          console.error("Błędny format danych:", data);
-        }
-      } catch (error) {
-        console.error("Błąd pobierania postów:", error);
-      }
-    };
-
     fetchPosts();
   }, []);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "searching":
-        return (
-          <div className="posts-container">
-            {posts.map((post) => (
-              <div key={post.id} className="post">
-                <div className="post-header">
-                  <img
-                    src={
-                      post.User?.profilePicture
-                        ? `http://localhost:5000/uploads/${post.User.profilePicture}`
-                        : "/default-profile.jpg"
-                    }
-                    alt="Profil"
-                    className="profile-pic"
-                  />
-                  <span>{post.User?.name || "Anonimowy użytkownik"}</span>
-                </div>
-                <h3 className="post-title">{post.title}</h3>
-                <p className="post-meta">
-                  Kraj: {post.country} | Data: {post.travelDate} | Dni: {post.days} | Cena: {post.priceFrom} - {post.priceTo} PLN | Liczba wolnych miejsc: {post.maxPeople}
-                </p>
-                <button className="expand-btn">Zobacz więcej</button>
-              </div>
-            ))}
-          </div>
-        );
-      case "trips":
-        return <div className="posts-container"><h3>Tu będą posty podróżnicze z mapą i zdjęciami</h3></div>;
-      case "friends":
-        return <div className="posts-container"><h3>Tu będą znajomi</h3></div>;
-      default:
-        return null;
+  const handleCreatePost = async (postData) => {
+    try {
+      console.log("Dane wysyłane do backendu:", postData);
+      const response = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (response.ok) {
+        const newPost = await response.json();
+        setPosts((prev) => [newPost, ...prev]);
+        setShowCreateForm(false);
+      } else {
+        
+        console.error("Nie udało się dodać posta");
+      }
+    } catch (error) {
+      console.error("Błąd dodawania posta:", error);
     }
   };
 
   return (
     <>
-      <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Navbar />
       <div className="homepage-container">
-        {renderContent()}
+        <div className="sidebar-left">
+          {!showCreateForm && (
+            <button className="add-post-sidebar" onClick={() => setShowCreateForm(true)}>
+              + Dodaj post
+            </button>
+          )}
+        </div>
+
+        <div className="main-content">
+          {showCreateForm ? (
+            <CreatePostSection
+              onCancel={() => setShowCreateForm(false)}
+              onSubmit={handleCreatePost}
+            />
+          ) : (
+            <div className="posts-container">
+              {posts.map((post) => (
+                <div key={post.id} className="post">
+                  <div className="post-header">
+                    <img
+                      src={`http://localhost:5000/uploads/${post.User?.profilePicture || "default-profile.jpg"}`}
+                      alt="Profil"
+                      className="profile-pic"
+                    />
+                    <span>{post.User?.username || "Użytkownik"}</span>
+                  </div>
+                  <h3 className="post-title">{post.title}</h3>
+                  <p className="post-meta">
+                  Data: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {post.priceFrom} - {post.priceTo} PLN | Miejsca: {post.maxPeople}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </>
   );
