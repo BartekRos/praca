@@ -1,36 +1,119 @@
 .create-post-container {
-    width: 100%;
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-  }
-  
-  .map-wrapper {
-    margin-bottom: 20px;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  }
-  
-  .form-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .form-wrapper input {
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-  
-  .form-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-  }
-  
-  button.cancel {
-    background: #ddd;
-  }
-  
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+  padding: 30px;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  font-family: 'Inter', sans-serif;
+}
+
+.map-wrapper {
+  margin-bottom: 25px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-wrapper label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.form-wrapper input,
+.form-wrapper textarea {
+  width: 95%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  font-size: 15px;
+  transition: border 0.3s ease;
+}
+
+.form-wrapper input:focus,
+.form-wrapper textarea:focus {
+  border-color: #555;
+  background-color: #fff;
+  outline: none;
+}
+
+.form-wrapper textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #646566;
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-actions button:hover {
+  background-color: #343435;
+}
+
+.form-actions .cancel {
+  background-color: #e2e8f0;
+  color: #333;
+}
+
+.form-actions .cancel:hover {
+  background-color: #cbd5e0;
+}
+
+.location-list {
+  margin: 20px 0;
+  background: #f1f5f9;
+  padding: 12px 16px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.location-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.location-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.location-list li:last-child {
+  border-bottom: none;
+}
+
+.location-list button {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #e53e3e;
+  font-weight: bold;
+}

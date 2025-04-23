@@ -1,11 +1,10 @@
-// src/components/CreatePostSection.js
 import React, { useState } from "react";
 import "./styles/CreatePostSection.css";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
-
-// Poprawne ikony Leaflet
 import "leaflet/dist/leaflet.css";
+
+// Konfiguracja ikon Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -34,18 +33,18 @@ const CreatePostSection = ({ onCancel, onSubmit }) => {
       const country = data.address.country;
       const city = data.address.city || data.address.town || data.address.village || "";
 
-      const newLocation = { country, city, lat, lng };
-      setLocations((prev) => [...prev, newLocation]);
-      // Zapobiegamy dodaniu duplikatu
-      const exists = locations.find(
-        (loc) => loc.lat === lat && loc.lng === lng
-      );
+      const exists = locations.find((loc) => loc.lat === lat && loc.lng === lng);
       if (!exists) {
+        const newLocation = { country, city, lat, lng };
         setLocations((prev) => [...prev, newLocation]);
       }
     } catch (err) {
       console.error("Błąd podczas pobierania lokalizacji:", err);
     }
+  };
+
+  const handleRemoveLocation = (index) => {
+    setLocations((prev) => prev.filter((_, i) => i !== index));
   };
 
   const MapClickHandler = () => {
@@ -92,18 +91,17 @@ const CreatePostSection = ({ onCancel, onSubmit }) => {
       <h2>Nowy wyjazd</h2>
 
       <div className="map-wrapper">
-          <MapContainer
-      center={[52, 19]}
-      zoom={5}
-      style={{ height: "300px" }}
-      scrollWheelZoom={false}
-      whenCreated={(mapInstance) => {
-        setTimeout(() => {
-          mapInstance.invalidateSize(); // Fix dla błędów wyświetlania
-        }, 0);
-      }}
-    >
-
+        <MapContainer
+          center={[52, 19]}
+          zoom={5}
+          style={{ height: "300px" }}
+          scrollWheelZoom={true}
+          whenCreated={(mapInstance) => {
+            setTimeout(() => {
+              mapInstance.invalidateSize();
+            }, 0);
+          }}
+        >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <MapClickHandler />
           {locations.map((loc, i) => (
@@ -111,6 +109,20 @@ const CreatePostSection = ({ onCancel, onSubmit }) => {
           ))}
         </MapContainer>
       </div>
+
+      {locations.length > 0 && (
+        <div className="location-list">
+          <h4>Wybrane miejsca:</h4>
+          <ul>
+            {locations.map((loc, index) => (
+              <li key={index}>
+                {loc.country} - {loc.city}
+                <button onClick={() => handleRemoveLocation(index)}>❌</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="form-wrapper">
         <label>Tytuł (automatyczny):</label>

@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import CreatePostSection from "../components/CreatePostSection";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 import "./styles/HomePage.css";
-
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [expandedPostId, setExpandedPostId] = useState(null);
 
-  // Fetch postów z backendu
+  delete L.Icon.Default.prototype._getIconUrl;
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+    iconUrl: require("leaflet/dist/images/marker-icon.png"),
+    shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+  });
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
   const fetchPosts = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/posts");
       const data = await response.json();
       if (Array.isArray(data)) {
-        // sortowanie najnowsze na górze
         const sorted = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setPosts(sorted);
       }
@@ -23,13 +35,8 @@ const HomePage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
   const handleCreatePost = async (postData) => {
     try {
-      console.log("Dane wysyłane do backendu:", postData);
       const response = await fetch("http://localhost:5000/api/posts", {
         method: "POST",
         headers: {
@@ -44,12 +51,15 @@ const HomePage = () => {
         setPosts((prev) => [newPost, ...prev]);
         setShowCreateForm(false);
       } else {
-        
         console.error("Nie udało się dodać posta");
       }
     } catch (error) {
       console.error("Błąd dodawania posta:", error);
     }
+  };
+
+  const toggleExpand = (postId) => {
+    setExpandedPostId(expandedPostId === postId ? null : postId);
   };
 
   return (
@@ -73,7 +83,11 @@ const HomePage = () => {
           ) : (
             <div className="posts-container">
               {posts.map((post) => (
-                <div key={post.id} className="post">
+                <div
+                  key={post.id}
+                  className={`post ${expandedPostId === post.id ? "expanded" : ""}`}
+                  onClick={() => toggleExpand(post.id)}
+                >
                   <div className="post-header">
                     <img
                       src={`http://localhost:5000/uploads/${post.User?.profilePicture || "default-profile.jpg"}`}
@@ -82,10 +96,34 @@ const HomePage = () => {
                     />
                     <span>{post.User?.username || "Użytkownik"}</span>
                   </div>
+
                   <h3 className="post-title">{post.title}</h3>
-                  <p className="post-meta">
-                  Data: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {post.priceFrom} - {post.priceTo} PLN | Miejsca: {post.maxPeople}
-                  </p>
+
+                  {expandedPostId === post.id && (
+                    <div className="post-description">
+                      <p><strong>Opis:</strong><br />{post.description}</p>
+                    </div>
+                  )}
+
+                      {expandedPostId === post.id && post.locationData?.length > 0 && (
+                        <div className="post-map" onClick={(e) => e.stopPropagation()}>
+                          <MapContainer
+                            center={[post.locationData[0].lat, post.locationData[0].lng]}
+                            zoom={5}
+                            scrollWheelZoom={true}
+                            style={{ height: "220px", width: "100%", borderRadius: "10px" }}
+                          >
+                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                            {post.locationData.map((loc, i) => (
+                              <Marker key={i} position={[loc.lat, loc.lng]} />
+                            ))}
+                          </MapContainer>
+                        </div>
+                      )}
+
+                      <p className="post-meta">
+                        Wyjazd w dniu: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {Math.round(post.priceFrom)} - {Math.round(post.priceTo)} PLN | Miejsca: {post.maxPeople}
+                      </p>
                 </div>
               ))}
             </div>

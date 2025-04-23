@@ -4,9 +4,9 @@ import AuthContext from "../context/AuthContext";
 import "./styles/Navbar.css";
 
 // Import ikon
-import planeIcon from "../assets/icons/plane.svg";
-import cameraIcon from "../assets/icons/camera.svg";
-import friendsIcon from "../assets/icons/friends.svg";
+import planeIcon from "../assets/icons/plane.png";
+import cameraIcon from "../assets/icons/camera.png";
+import friendsIcon from "../assets/icons/friends.png";
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
