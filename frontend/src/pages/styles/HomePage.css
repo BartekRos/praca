@@ -1,5 +1,6 @@
 .homepage-container {
   position: relative;
+  background-color: #faf8f4;
   background-image: url('mapa.png');
   background-size: cover;
   background-repeat: no-repeat;

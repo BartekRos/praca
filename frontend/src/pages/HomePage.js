@@ -86,7 +86,12 @@ const HomePage = () => {
                 <div
                   key={post.id}
                   className={`post ${expandedPostId === post.id ? "expanded" : ""}`}
-                  onClick={() => toggleExpand(post.id)}
+                  onClick={(e) => {
+                    const selection = window.getSelection();
+                    if (selection && selection.toString().length === 0) {
+                      toggleExpand(post.id);
+                    }
+                  }}
                 >
                   <div className="post-header">
                     <img
