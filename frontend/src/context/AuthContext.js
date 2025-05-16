@@ -7,28 +7,28 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
+if (savedUser) {
+  try {
+    const parsedUser = JSON.parse(savedUser);
+    setUser(parsedUser);
+  } catch (error) {
+    console.error("Błąd parsowania użytkownika z localStorage:", error);
+    localStorage.removeItem("user");
+  }
+}
 
-    if (savedUser && token) {
-      try {
-        setUser(JSON.parse(savedUser)); // Ustawienie użytkownika
-      } catch (error) {
-        console.error("Błąd parsowania użytkownika z localStorage:", error);
-        localStorage.removeItem("user"); // Jeśli błąd, usuń niepoprawne dane
-      }
-    }
   }, []);
 
   const login = (userData, token) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", token);
+
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    
   };
 
   return (

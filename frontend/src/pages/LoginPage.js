@@ -26,7 +26,8 @@ const LoginPage = () => {
         throw new Error(data.message || "Błąd logowania");
       }
 
-      login(data.user, data.token);
+      const mergedUser = { ...data.user, token: data.token };
+      login(mergedUser);
       navigate("/");
     } catch (error) {
       console.error("Błąd logowania:", error);

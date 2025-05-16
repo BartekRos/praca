@@ -8,6 +8,8 @@ import FriendsPage from "./pages/FriendsPage";
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import 'leaflet/dist/leaflet.css';
+import ProfilePage from './pages/ProfilePage';
+import ChatPage from './pages/ChatPage';
 
 
 
@@ -20,10 +22,11 @@ const App = () => {
           <Route path="/trips" element={<TripsPage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          
+          <Route path="/profile" element={<ProfilePage />}/>
           {/* Zabezpieczona trasa dla HomePage */}
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/messages" element={<ChatPage />} />
           </Route>
         </Routes>
       </Router>

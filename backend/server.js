@@ -8,6 +8,9 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 const postRoutes = require("./routes/post");
 const path = require('path');
+const userRoutes = require('./routes/users');
+const messageRoutes = require('./routes/messages');
+const chatRoutes = require('./routes/chats');
 require('./models/Users');
 require('./models/Post');
 require('./models/UserActivity');
@@ -70,6 +73,8 @@ app.use("/api/posts", postRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use('/api/users', userRoutes);
 
+app.use('/api/messages', messageRoutes);
 
-
+app.use('/api/chats', chatRoutes);
