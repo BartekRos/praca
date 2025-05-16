@@ -1,0 +1,62 @@
+.friends-page {
+    padding: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .friends-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .friend-card {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    gap: 15px;
+  }
+  
+  .friend-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .friend-actions {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .friend-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #007bff;
+  }
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .search-bar input {
+    flex-grow: 1;
+    padding: 10px;
+  }
+  
+  .search-bar button {
+    padding: 10px 20px;
+  }
+  

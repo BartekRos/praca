@@ -11,6 +11,7 @@ const path = require('path');
 const userRoutes = require('./routes/users');
 const messageRoutes = require('./routes/messages');
 const chatRoutes = require('./routes/chats');
+const friendsRoutes = require('./routes/friends');
 require('./models/Users');
 require('./models/Post');
 require('./models/UserActivity');
@@ -78,3 +79,5 @@ app.use('/api/users', userRoutes);
 app.use('/api/messages', messageRoutes);
 
 app.use('/api/chats', chatRoutes);
+
+app.use('/api/friends', friendsRoutes);
