@@ -13,6 +13,7 @@ L.Icon.Default.mergeOptions({
 });
 
 const CreatePostSection = ({ onCancel, onSubmit }) => {
+
   const [locations, setLocations] = useState([]);
   const [travelDate, setTravelDate] = useState("");
   const [duration, setDuration] = useState("");
@@ -66,7 +67,7 @@ const CreatePostSection = ({ onCancel, onSubmit }) => {
       .join(" | ");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (locations.length === 0) {
       alert("Musisz wybrać przynajmniej jedną lokalizację na mapie!");
       return;
@@ -83,7 +84,7 @@ const CreatePostSection = ({ onCancel, onSubmit }) => {
       locationData: locations,
     };
 
-    onSubmit(post);
+    onSubmit(post);  // przekazujemy dane do HomePage.js
   };
 
   return (
@@ -159,6 +160,5 @@ const CreatePostSection = ({ onCancel, onSubmit }) => {
     </div>
   );
 };
-
 
 export default CreatePostSection;

@@ -1,15 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Navbar from "../components/Navbar";
 import CreatePostSection from "../components/CreatePostSection";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./styles/HomePage.css";
+import AuthContext from "../context/AuthContext";
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [expandedPostId, setExpandedPostId] = useState(null);
+  const { user } = useContext(AuthContext);
+
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -36,27 +39,35 @@ const HomePage = () => {
   };
 
   const handleCreatePost = async (postData) => {
-    try {
-      const response = await fetch("http://localhost:5000/api/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(postData),
-      });
+  try {
+    const response = await fetch("http://localhost:5000/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+      body: JSON.stringify(postData),
+    });
 
-      if (response.ok) {
-        const newPost = await response.json();
-        setPosts((prev) => [newPost, ...prev]);
-        setShowCreateForm(false);
-      } else {
-        console.error("Nie udało się dodać posta");
-      }
-    } catch (error) {
-      console.error("Błąd dodawania posta:", error);
+    if (!response.ok) {
+      throw new Error("Nie udało się dodać posta");
     }
-  };
+
+    const newPost = await response.json();
+
+    if (newPost && newPost.User) {
+      setPosts((prev) => [newPost, ...prev]); // ← Dodaj od razu na górze
+      setShowCreateForm(false);
+    } else {
+      console.warn("Nowy post nie zawiera użytkownika. Odświeżam z serwera.");
+      fetchPosts(); // fallback – pobierz wszystko jeszcze raz
+    }
+  } catch (error) {
+    console.error("Błąd dodawania posta:", error);
+    alert("Wystąpił błąd przy dodawaniu posta");
+  }
+};
+
 
   const toggleExpand = (postId) => {
     setExpandedPostId(expandedPostId === postId ? null : postId);

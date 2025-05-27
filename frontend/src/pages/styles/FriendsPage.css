@@ -1,5 +1,13 @@
 .friends-page {
     padding: 20px;
+    position: relative;
+    background-color: #faf8f4;
+    background-image: url('mapa.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center top 75px;
+    justify-content: center;
   }
   
   .header {
@@ -23,6 +31,7 @@
     border-radius: 8px;
     box-shadow: 0 0 5px rgba(0,0,0,0.1);
     gap: 15px;
+    margin-top: 10px;
   }
   
   .friend-card img {

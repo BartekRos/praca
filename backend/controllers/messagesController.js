@@ -1,49 +1,104 @@
+const Conversation = require('../models/Conversation');
 const Message = require('../models/Message');
+const User = require('../models/Users');
+const { Op } = require('sequelize');
 
-exports.sendMessage = async (req, res) => {
+// Tworzenie lub pobieranie konwersacji
+exports.startConversation = async (req, res) => {
   try {
-    const { receiverId, content } = req.body;
-    const message = await Message.create({
-      senderId: req.user.id,
-      receiverId,
-      content
-    });
-    res.json(message);
-  } catch (err) {
-    res.status(500).json({ error: 'Błąd wysyłania wiadomości', details: err.message });
-  }
-};
+    const senderId = req.user.id;
+    const { recipientId } = req.body;
 
-exports.getMessages = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const messages = await Message.findAll({
+    if (recipientId === senderId) {
+      return res.status(400).json({ message: 'Nie możesz rozmawiać sam ze sobą' });
+    }
+
+    let conversation = await Conversation.findOne({
       where: {
-        senderId: req.user.id,
-        receiverId: userId
+        [Op.or]: [
+          { user1Id: senderId, user2Id: recipientId },
+          { user1Id: recipientId, user2Id: senderId },
+        ]
       }
     });
-    res.json(messages);
-  } catch (err) {
-    res.status(500).json({ error: 'Błąd pobierania wiadomości', details: err.message });
+
+    if (!conversation) {
+      conversation = await Conversation.create({ user1Id: senderId, user2Id: recipientId });
+    }
+
+    res.json(conversation);
+  } catch (error) {
+    console.error('❌ Błąd startowania rozmowy:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
   }
 };
 
-exports.listConversations = async (req, res) => {
+// Wysyłanie wiadomości
+exports.sendMessage = async (req, res) => {
+    const { conversationId, content } = req.body;
     try {
-      const [results] = await db.query(`
-        SELECT DISTINCT u.id AS userId, u.username
-        FROM users u
-        JOIN messages m ON (m.senderId = u.id OR m.receiverId = u.id)
-        WHERE u.id != :userId AND (m.senderId = :userId OR m.receiverId = :userId)
-      `, {
-        replacements: { userId: req.user.id }
+      if (!conversationId) {
+        return res.status(400).json({ message: 'Brak conversationId' });
+      }
+  
+      const message = await Message.create({
+        conversationId,
+        senderId: req.user.id,
+        content,
       });
   
-      res.json(results);
-    } catch (err) {
-      console.error('❌ Błąd pobierania rozmów:', err);
-      res.status(500).json({ error: 'Błąd serwera', details: err.message });
+      res.json(message);
+    } catch (error) {
+      console.error('Błąd wysyłania wiadomości:', error);
+      res.status(500).json({ message: 'Błąd wysyłania wiadomości' });
     }
   };
-  
+
+// Pobieranie wiadomości z konwersacji
+exports.getMessages = async (req, res) => {
+  try {
+    const conversationId = req.params.conversationId;
+    const messages = await Message.findAll({
+        where: { conversationId },
+        order: [['createdAt', 'ASC']],
+        include: [{ model: User, as: 'Sender', attributes: ['id', 'username', 'profilePicture'] }]
+      });
+
+    res.json(messages);
+  } catch (error) {
+    console.error('❌ Błąd pobierania wiadomości:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+};
+
+// Lista rozmów użytkownika
+exports.listConversations = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const conversations = await Conversation.findAll({
+      where: {
+        [Op.or]: [
+          { user1Id: userId },
+          { user2Id: userId }
+        ]
+      }
+    });
+
+    const result = await Promise.all(conversations.map(async conv => {
+      const friendId = conv.user1Id === userId ? conv.user2Id : conv.user1Id;
+      const friend = await User.findByPk(friendId);
+      return {
+        conversationId: conv.id,
+        userId: friend.id,
+        username: friend.username,
+        profilePicture: friend.profilePicture
+      };
+    }));
+
+    res.json(result);
+  } catch (error) {
+    console.error('❌ Błąd pobierania rozmów:', error);
+    res.status(500).json({ message: 'Błąd serwera' });
+  }
+};

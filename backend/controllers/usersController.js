@@ -3,7 +3,7 @@ const { QueryTypes } = require('sequelize');
 
 exports.getUserProfile = (req, res) => {
   const userId = req.user?.id;
-  console.log('Decoded user w req:', req.user);
+
 
   if (!userId) {
     return res.status(401).json({ message: 'Brak ID użytkownika w tokenie' });

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 exports.authMiddleware = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
+
   if (!token) {
     return res.status(401).json({ message: 'Brak tokenu, nieautoryzowany dostęp' });
   }
@@ -11,6 +12,7 @@ exports.authMiddleware = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    console.error("❌ Błąd weryfikacji tokenu:", error.message);
     res.status(401).json({ message: 'Nieprawidłowy token' });
   }
 };

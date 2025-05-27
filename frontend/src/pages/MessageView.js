@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
@@ -8,52 +8,67 @@ const MessageView = ({ conversation }) => {
   const [newMessage, setNewMessage] = useState('');
 
   useEffect(() => {
+    if (!user || !conversation?.conversationId) return;
+
     const fetchMessages = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/messages/${conversation.userId}`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
+        const res = await axios.get(
+          `http://localhost:5000/api/messages/${conversation.conversationId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
+        );
         setMessages(res.data);
-      } catch (err) {
-        console.error('❌ Błąd pobierania wiadomości:', err);
+      } catch (error) {
+        console.error('❌ Błąd pobierania wiadomości:', error);
       }
     };
 
     fetchMessages();
-  }, [conversation, user]);
+  }, [user, conversation?.conversationId]);
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
-    try {
-      const res = await axios.post('http://localhost:5000/api/messages', {
-        receiverId: conversation.userId,
-        content: newMessage,
-      }, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
 
-      setMessages((prev) => [...prev, res.data]);
+    try {
+      const res = await axios.post(
+        'http://localhost:5000/api/messages',
+        {
+          conversationId: conversation.conversationId,
+          receiverId: conversation.userId,
+          content: newMessage,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+
+      setMessages(prev => [...prev, res.data]);
       setNewMessage('');
-    } catch (err) {
-      console.error('❌ Błąd wysyłania wiadomości:', err);
+    } catch (error) {
+      console.error('❌ Błąd wysyłania wiadomości:', error);
     }
   };
 
   return (
     <div className="message-view">
-      <div className="messages-list">
-        {messages.map((msg) => (
-          <div key={msg.id} className={msg.senderId === user.id ? 'my-message' : 'their-message'}>
-            {msg.content}
-          </div>
-        ))}
-      </div>
-      <div className="send-message">
+      {messages.map((m) => (
+        <div
+          key={m.id}
+          className={m.senderId === user?.id ? 'my-message' : 'their-message'}
+        >
+          {m.content}
+        </div>
+      ))}
+      <div className="message-input">
         <input
-          type="text"
-          placeholder="Napisz wiadomość..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
+          placeholder="Napisz wiadomość..."
         />
         <button onClick={handleSend}>Wyślij</button>
       </div>
