@@ -76,3 +76,99 @@
     padding: 10px 20px;
   }
   
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  
+  .modal h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .modal input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  
+  .modal .friend-checkbox {
+    margin: 5px 0;
+  }
+  
+  .modal .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  .modal button {
+    flex: 1;
+    padding: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    transition: background-color 0.3s;
+  }
+  
+  .modal button.confirm {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .modal button.cancel {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .add-group-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .add-group-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .group-chat-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .group-chat-item:hover {
+    background-color: #f0f0f0;
+  }
+  

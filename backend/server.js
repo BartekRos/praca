@@ -15,12 +15,27 @@ const friendsRoutes = require('./routes/friends');
 const Conversation = require('./models/Conversation');
 const Message = require('./models/Message');
 const User = require('./models/Users');
+const GroupMessage = require('./models/GroupMessage');
+const ChatParticipant = require('./models/ChatParticipant');
+const Chat = require('./models/Chat');
 
 Conversation.hasMany(Message, { foreignKey: 'conversationId' });
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
 
 Message.belongsTo(User, { foreignKey: 'senderId', as: 'Sender' });
 User.hasMany(Message, { foreignKey: 'senderId', as: 'SentMessages' });
+
+Chat.hasMany(ChatParticipant, { foreignKey: 'chatId' });
+ChatParticipant.belongsTo(Chat, { foreignKey: 'chatId' });
+
+ChatParticipant.belongsTo(User, { foreignKey: 'userId' });
+User.hasMany(ChatParticipant, { foreignKey: 'userId' });
+
+Chat.hasMany(GroupMessage, { foreignKey: 'chatId' });
+GroupMessage.belongsTo(Chat, { foreignKey: 'chatId' });
+
+User.hasMany(GroupMessage, { foreignKey: 'senderId' });
+GroupMessage.belongsTo(User, { foreignKey: 'senderId' });
 
 
 require('./models/Users');
