@@ -1,6 +1,7 @@
 .messages-page {
     display: flex;
     height: 100vh;
+    
   }
   
   .sidebar {
@@ -172,3 +173,83 @@
     background-color: #f0f0f0;
   }
   
+  .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+}
+
+.conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.message-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+}
+
+.my-message,
+.their-message {
+  max-width: 70%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin: 5px 0;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.my-message {
+  background-color: #dcf8c6;
+  align-self: flex-end;
+}
+
+.their-message {
+  background-color: #f1f0f0;
+  align-self: flex-start;
+}
+
+.message-view {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.message-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.message-input input {
+  flex: 1;
+  padding: 8px;
+  font-size: 16px;
+}
+
+.message-input button {
+  margin-left: 8px;
+  padding: 8px 12px;
+}
+
+.message-input textarea {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  max-height: 150px; /* możesz ustawić limit jeśli chcesz */
+}
+

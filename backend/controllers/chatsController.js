@@ -47,7 +47,7 @@ exports.getGroupMessages = async (req, res) => {
     const { chatId } = req.params;
     const messages = await GroupMessage.findAll({
       where: { chatId },
-      include: [{ model: Users, attributes: ['id', 'username'] }],
+      include: [{ model: Users, attributes: ['id', 'username', 'profilePicture'] }],
     });    
     res.json(messages);
   } catch (err) {

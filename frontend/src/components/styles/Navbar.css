@@ -4,7 +4,7 @@
   align-items: center;
   padding: 25px 40px 15px; /* Zwiększamy górny padding */
   background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   position: sticky;
   z-index: 1000;
   top: 0;

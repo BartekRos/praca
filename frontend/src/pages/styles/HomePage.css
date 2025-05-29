@@ -1,16 +1,17 @@
 .homepage-container {
   position: relative;
   background-color: #faf8f4;
-  background-image: url('mapa.jpg');
+  background-image: url('mapa.jpg');opacity: 1;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  background-position: center top 75px;
+  
   display: flex;
   /* więcej miejsca między przyciskiem a postami */
   padding: 20px 40px;
   box-sizing: border-box;
   justify-content: center;
+  min-height: 100vh
 }
 
   .title {

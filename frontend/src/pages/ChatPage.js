@@ -25,12 +25,10 @@ const ChatPage = () => {
 
     const fetchData = async () => {
       try {
-        // Rozmowy 1:1
         const privateRes = await axios.get('http://localhost:5000/api/messages/list', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
-        // Rozmowy grupowe
         const groupRes = await axios.get('http://localhost:5000/api/chats', {
           headers: { Authorization: `Bearer ${user.token}` },
         });
@@ -48,12 +46,19 @@ const ChatPage = () => {
               { recipientId: +userIdFromQuery },
               { headers: { Authorization: `Bearer ${user.token}` } }
             );
+
+            const { data: userInfo } = await axios.get(
+              `http://localhost:5000/api/users/${userIdFromQuery}`,
+              { headers: { Authorization: `Bearer ${user.token}` } }
+            );
+
             const newConv = {
               conversationId: conv.id,
               userId: +userIdFromQuery,
-              username: `Użytkownik ${userIdFromQuery}`,
-              profilePicture: ''
+              username: userInfo.username,
+              profilePicture: userInfo.profilePicture || ''
             };
+
             setConversations(prev => [...prev, newConv]);
             setSelectedChat(newConv);
           }
@@ -80,25 +85,61 @@ const ChatPage = () => {
 
   const handleCreateGroup = async () => {
     try {
-      const res = await axios.post(
-        'http://localhost:5000/api/chats',
-        {
-          name: groupName,
-          participantIds: selectedFriends,
-        },
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
+      if (selectedFriends.length === 1) {
+        const recipientId = selectedFriends[0];
+
+        const existing = conversations.find(c => c.userId === recipientId);
+        if (existing) {
+          setSelectedChat(existing);
+        } else {
+          const { data: conv } = await axios.post(
+            'http://localhost:5000/api/messages/start',
+            { recipientId },
+            {
+              headers: { Authorization: `Bearer ${user.token}` }
+            }
+          );
+
+          const { data: userInfo } = await axios.get(
+            `http://localhost:5000/api/users/${recipientId}`,
+            { headers: { Authorization: `Bearer ${user.token}` } }
+          );
+
+          const newConv = {
+            conversationId: conv.id,
+            userId: recipientId,
+            username: userInfo.username,
+            profilePicture: userInfo.profilePicture || ''
+          };
+
+          setConversations(prev => [...prev, newConv]);
+          setSelectedChat(newConv);
         }
-      );
-      setGroupChats(prev => [...prev, {
-        ...res.data,
-        isGroup: true,
-      }]);
+      } else if (selectedFriends.length > 1) {
+        const { data: chat } = await axios.post(
+          'http://localhost:5000/api/chats',
+          {
+            name: groupName || 'Nowa grupa',
+            participantIds: selectedFriends
+          },
+          {
+            headers: { Authorization: `Bearer ${user.token}` }
+          }
+        );
+        const newGroup = {
+          id: chat.id,
+          name: chat.name,
+          isGroup: true
+        };
+        setGroupChats(prev => [...prev, newGroup]);
+        setSelectedChat(newGroup);
+      }
+
       setShowGroupModal(false);
       setGroupName('');
       setSelectedFriends([]);
     } catch (err) {
-      console.error('❌ Błąd tworzenia grupy:', err);
+      console.error('❌ Błąd tworzenia konwersacji:', err);
     }
   };
 
@@ -118,23 +159,28 @@ const ChatPage = () => {
           <h3>Rozmowy</h3>
 
           <button onClick={openGroupModal} className="add-group-button">
-            ➕ Utwórz grupę
+            ➕ Utwórz konwersację
           </button>
 
           {conversations.length === 0 && groupChats.length === 0 && <p>Brak rozmów.</p>}
 
-          {/* Rozmowy 1:1 */}
           {conversations.map((conv) => (
             <div
               key={`dm-${conv.conversationId}`}
               className={`conversation ${selectedChat?.conversationId === conv.conversationId ? 'active' : ''}`}
               onClick={() => setSelectedChat(conv)}
             >
-              {conv.username}
+              <div className="conversation-item">
+                <img
+                  src={`http://localhost:5000/uploads/${conv.profilePicture || 'default.png'}`}
+                  alt="avatar"
+                  className="avatar"
+                />
+                <span>{conv.username}</span>
+              </div>
             </div>
           ))}
 
-          {/* Grupy */}
           {groupChats.map((chat) => (
             <div
               key={`group-${chat.id}`}
@@ -158,11 +204,12 @@ const ChatPage = () => {
       {showGroupModal && (
         <div className="modal-overlay">
           <div className="modal">
-            <h3>Utwórz grupę</h3>
+            <h3>Utwórz konwersację</h3>
             <input
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
-              placeholder="Nazwa grupy"
+              placeholder="Nazwa grupy (opcjonalna)"
+              disabled={selectedFriends.length <= 1}
             />
             <div className="friends-list">
               {friends.map((f) => (

@@ -8,6 +8,7 @@
     background-attachment: fixed;
     background-position: center top 75px;
     justify-content: center;
+    min-height: 100vh
   }
   
   .header {

@@ -42,7 +42,18 @@ const MessageView = ({ conversation }) => {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        setMessages(prev => [...prev, res.data]); // ⬅️ dodaj wiadomość po wysłaniu
+        setMessages((prev) => [
+          ...prev,
+          {
+            ...res.data,
+            User: {
+              id: user.id,
+              username: user.username,
+              profilePicture: user.profilePicture,
+            },
+          },
+        ]);
+        
       } else {
         const res = await axios.post(
           'http://localhost:5000/api/messages',
@@ -55,7 +66,18 @@ const MessageView = ({ conversation }) => {
             headers: { Authorization: `Bearer ${user.token}` },
           }
         );
-        setMessages((prev) => [...prev, res.data]);
+        setMessages((prev) => [
+          ...prev,
+          {
+            ...res.data,
+            User: {
+              id: user.id,
+              username: user.username,
+              profilePicture: user.profilePicture,
+            },
+          },
+        ]);
+        
       }
 
       setNewMessage('');
@@ -68,21 +90,36 @@ const MessageView = ({ conversation }) => {
     <div className="message-view">
       {messages.map((m) => (
         <div
-          key={m.id}
-          className={m.senderId === user.id ? 'my-message' : 'their-message'}
-        >
-          {isGroup && m.senderId !== user.id ? (
+        key={m.id}
+        className={m.senderId === user.id ? 'my-message' : 'their-message'}
+      >
+        {isGroup || m.senderId !== user.id ? (
+          <img
+            src={`http://localhost:5000/uploads/${(m.User || m.Sender)?.profilePicture || 'default.png'}`}
+            alt="avatar"
+            className="message-avatar"
+          />
+        ) : null}
+        <div className="message-content">
+          {isGroup && m.senderId !== user.id && (
             <strong>{m.User?.username || m.senderId}: </strong>
-          ) : null}
+          )}
           {m.content}
         </div>
+      </div>
+      
       ))}
       <div className="message-input">
-        <input
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Napisz wiadomość..."
-        />
+      <textarea
+        value={newMessage}
+        onChange={(e) => setNewMessage(e.target.value)}
+        placeholder="Napisz wiadomość..."
+        rows={1}
+        onInput={(e) => {
+          e.target.style.height = 'auto';
+          e.target.style.height = e.target.scrollHeight + 'px';
+        }}
+      />
         <button onClick={handleSend}>Wyślij</button>
       </div>
     </div>
