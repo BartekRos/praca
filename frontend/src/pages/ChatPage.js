@@ -83,6 +83,21 @@ const ChatPage = () => {
     }
   };
 
+  const confirmAndRemoveConversation = (convId) => {
+    if (window.confirm('Czy na pewno chcesz usunąć tę konwersację?')) {
+      setConversations(prev => prev.filter(c => c.conversationId !== convId));
+      if (selectedChat?.conversationId === convId) setSelectedChat(null);
+    }
+  };
+  
+  const confirmAndRemoveGroup = (chatId) => {
+    if (window.confirm('Czy na pewno chcesz usunąć tę rozmowę grupową?')) {
+      setGroupChats(prev => prev.filter(c => c.id !== chatId));
+      if (selectedChat?.id === chatId) setSelectedChat(null);
+    }
+  };  
+  
+  
   const handleCreateGroup = async () => {
     try {
       if (selectedFriends.length === 1) {
@@ -165,31 +180,46 @@ const ChatPage = () => {
           {conversations.length === 0 && groupChats.length === 0 && <p>Brak rozmów.</p>}
 
           {conversations.map((conv) => (
-            <div
-              key={`dm-${conv.conversationId}`}
-              className={`conversation ${selectedChat?.conversationId === conv.conversationId ? 'active' : ''}`}
-              onClick={() => setSelectedChat(conv)}
-            >
-              <div className="conversation-item">
-                <img
-                  src={`http://localhost:5000/uploads/${conv.profilePicture || 'default.png'}`}
-                  alt="avatar"
-                  className="avatar"
-                />
-                <span>{conv.username}</span>
-              </div>
-            </div>
-          ))}
+        <div
+          key={`dm-${conv.conversationId}`}
+          className={`conversation ${selectedChat?.conversationId === conv.conversationId ? 'active' : ''}`}
+        >
+          <div className="conversation-item" onClick={() => setSelectedChat(conv)}>
+            <img
+              src={`http://localhost:5000/uploads/${conv.profilePicture || 'default.png'}`}
+              alt="avatar"
+              className="avatar"
+            />
+            <span>{conv.username}</span>
+          </div>
+          <button
+            onClick={() => confirmAndRemoveConversation(conv.conversationId)}
+            className="delete-btn"
+            title="Usuń konwersację"
+          >
+            ❌
+          </button>
+        </div>
+      ))}
 
           {groupChats.map((chat) => (
-            <div
-              key={`group-${chat.id}`}
-              className={`conversation ${selectedChat?.id === chat.id ? 'active' : ''}`}
-              onClick={() => setSelectedChat({ ...chat, isGroup: true })}
-            >
+          <div
+            key={`group-${chat.id}`}
+            className={`conversation ${selectedChat?.id === chat.id ? 'active' : ''}`}
+          >
+            <div className="conversation-item" onClick={() => setSelectedChat({ ...chat, isGroup: true })}>
               💬 {chat.name}
             </div>
-          ))}
+            <button
+              onClick={() => confirmAndRemoveGroup(chat.id)}
+              className="delete-btn"
+              title="Usuń grupę"
+            >
+              ❌
+            </button>
+          </div>
+        ))}
+
         </div>
 
         <div className="chat-window">

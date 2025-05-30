@@ -1,7 +1,7 @@
 .homepage-container {
   position: relative;
   background-color: #faf8f4;
-  background-image: url('mapa.jpg');opacity: 1;
+  background-image: url('mapa.png');opacity: 1;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -57,6 +57,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
+    object-fit: cover;
   }
   
   .post-meta {
@@ -188,4 +189,9 @@
   word-break: break-word;
   white-space: normal;
   line-height: 1.4;
+}
+
+.message-icon:hover {
+  transform: scale(1.15);
+  transition: transform 0.2s ease;
 }

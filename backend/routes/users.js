@@ -10,7 +10,7 @@ router.get('/profile', authMiddleware, getUserProfile);
 router.get('/:id', authMiddleware, async (req, res) => {
     try {
       const user = await Users.findByPk(req.params.id, {
-        attributes: ['id', 'username', 'name', 'profilePicture'],
+        attributes: ['id', 'username', 'name', 'profilePicture', 'email', 'city', 'age', 'createdAt'],
       });
   
       if (!user) return res.status(404).json({ message: 'Użytkownik nie znaleziony' });

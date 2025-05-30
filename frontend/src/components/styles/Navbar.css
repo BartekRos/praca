@@ -83,6 +83,7 @@
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  object-fit: cover;
 }
 
 .profile-icon:hover {

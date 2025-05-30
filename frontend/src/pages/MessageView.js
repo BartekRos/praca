@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
@@ -22,6 +22,7 @@ const MessageView = ({ conversation }) => {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         setMessages(res.data);
+        setTimeout(scrollToBottom, 100);
       } catch (error) {
         console.error('❌ Błąd pobierania wiadomości:', error);
       }
@@ -30,6 +31,13 @@ const MessageView = ({ conversation }) => {
     fetchMessages();
   }, [user, conversation, isGroup]);
 
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  
+  
   const handleSend = async () => {
     if (!newMessage.trim()) return;
 
@@ -53,7 +61,8 @@ const MessageView = ({ conversation }) => {
             },
           },
         ]);
-        
+        setTimeout(scrollToBottom, 100);
+              
       } else {
         const res = await axios.post(
           'http://localhost:5000/api/messages',
@@ -90,6 +99,7 @@ const MessageView = ({ conversation }) => {
     <div className="message-view">
       {messages.map((m) => (
         <div
+        ref={messagesEndRef}
         key={m.id}
         className={m.senderId === user.id ? 'my-message' : 'their-message'}
       >
@@ -104,22 +114,30 @@ const MessageView = ({ conversation }) => {
           {isGroup && m.senderId !== user.id && (
             <strong>{m.User?.username || m.senderId}: </strong>
           )}
-          {m.content}
+          {m.content.split('\n').map((line, idx) => (
+            <React.Fragment key={idx}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
         </div>
       </div>
       
       ))}
       <div className="message-input">
-      <textarea
-        value={newMessage}
-        onChange={(e) => setNewMessage(e.target.value)}
-        placeholder="Napisz wiadomość..."
-        rows={1}
-        onInput={(e) => {
-          e.target.style.height = 'auto';
-          e.target.style.height = e.target.scrollHeight + 'px';
-        }}
-      />
+        <textarea
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+          placeholder="Napisz wiadomość..."
+          rows={1}
+          className="expanding-textarea"
+        />
         <button onClick={handleSend}>Wyślij</button>
       </div>
     </div>

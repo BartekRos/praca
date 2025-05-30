@@ -13,7 +13,6 @@ const HomePage = () => {
   const [expandedPostId, setExpandedPostId] = useState(null);
   const { user } = useContext(AuthContext);
 
-
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -39,35 +38,32 @@ const HomePage = () => {
   };
 
   const handleCreatePost = async (postData) => {
-  try {
-    const response = await fetch("http://localhost:5000/api/posts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify(postData),
-    });
+    try {
+      const response = await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(postData),
+      });
 
-    if (!response.ok) {
-      throw new Error("Nie udało się dodać posta");
+      if (!response.ok) throw new Error("Nie udało się dodać posta");
+
+      const newPost = await response.json();
+
+      if (newPost && newPost.User) {
+        setPosts((prev) => [newPost, ...prev]);
+        setShowCreateForm(false);
+      } else {
+        console.warn("Nowy post nie zawiera użytkownika. Odświeżam z serwera.");
+        fetchPosts();
+      }
+    } catch (error) {
+      console.error("Błąd dodawania posta:", error);
+      alert("Wystąpił błąd przy dodawaniu posta");
     }
-
-    const newPost = await response.json();
-
-    if (newPost && newPost.User) {
-      setPosts((prev) => [newPost, ...prev]); // ← Dodaj od razu na górze
-      setShowCreateForm(false);
-    } else {
-      console.warn("Nowy post nie zawiera użytkownika. Odświeżam z serwera.");
-      fetchPosts(); // fallback – pobierz wszystko jeszcze raz
-    }
-  } catch (error) {
-    console.error("Błąd dodawania posta:", error);
-    alert("Wystąpił błąd przy dodawaniu posta");
-  }
-};
-
+  };
 
   const toggleExpand = (postId) => {
     setExpandedPostId(expandedPostId === postId ? null : postId);
@@ -104,13 +100,38 @@ const HomePage = () => {
                     }
                   }}
                 >
-                  <div className="post-header">
-                    <img
-                      src={`http://localhost:5000/uploads/${post.User?.profilePicture || "default-profile.jpg"}`}
-                      alt="Profil"
-                      className="profile-pic"
-                    />
-                    <span>{post.User?.username || "Użytkownik"}</span>
+                  <div className="post-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div
+                      className="user-info"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (post.User?.id) {
+                          window.location.href = `/profile/${post.User.id}`;
+                        }
+                      }}
+                      style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
+                    >
+                      <img
+                        src={`http://localhost:5000/uploads/${post.User?.profilePicture || "default-profile.jpg"}`}
+                        alt="Profil"
+                        className="profile-pic"
+                      />
+                      <span style={{ marginLeft: "8px" }}>{post.User?.username || "Użytkownik"}</span>
+                    </div>
+
+                    {expandedPostId === post.id && post.User?.id !== user?.id && (
+                      <div
+                        className="message-icon"
+                        title="Napisz wiadomość"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/messages?userId=${post.User.id}`;
+                        }}
+                        style={{ cursor: "pointer", fontSize: "20px" }}
+                      >
+                        💬
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="post-title">{post.title}</h3>
@@ -121,25 +142,25 @@ const HomePage = () => {
                     </div>
                   )}
 
-                      {expandedPostId === post.id && post.locationData?.length > 0 && (
-                        <div className="post-map" onClick={(e) => e.stopPropagation()}>
-                          <MapContainer
-                            center={[post.locationData[0].lat, post.locationData[0].lng]}
-                            zoom={5}
-                            scrollWheelZoom={true}
-                            style={{ height: "220px", width: "100%", borderRadius: "10px" }}
-                          >
-                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                            {post.locationData.map((loc, i) => (
-                              <Marker key={i} position={[loc.lat, loc.lng]} />
-                            ))}
-                          </MapContainer>
-                        </div>
-                      )}
+                  {expandedPostId === post.id && post.locationData?.length > 0 && (
+                    <div className="post-map" onClick={(e) => e.stopPropagation()}>
+                      <MapContainer
+                        center={[post.locationData[0].lat, post.locationData[0].lng]}
+                        zoom={5}
+                        scrollWheelZoom={true}
+                        style={{ height: "220px", width: "100%", borderRadius: "10px" }}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        {post.locationData.map((loc, i) => (
+                          <Marker key={i} position={[loc.lat, loc.lng]} />
+                        ))}
+                      </MapContainer>
+                    </div>
+                  )}
 
-                      <p className="post-meta">
-                        Wyjazd w dniu: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {Math.round(post.priceFrom)} - {Math.round(post.priceTo)} PLN | Miejsca: {post.maxPeople}
-                      </p>
+                  <p className="post-meta">
+                    Wyjazd w dniu: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {Math.round(post.priceFrom)} - {Math.round(post.priceTo)} PLN | Miejsca: {post.maxPeople}
+                  </p>
                 </div>
               ))}
             </div>
