@@ -18,6 +18,7 @@ const User = require('./models/Users');
 const GroupMessage = require('./models/GroupMessage');
 const ChatParticipant = require('./models/ChatParticipant');
 const Chat = require('./models/Chat');
+const tripPostsRoutes = require('./routes/tripPosts');
 
 Conversation.hasMany(Message, { foreignKey: 'conversationId' });
 Message.belongsTo(Conversation, { foreignKey: 'conversationId' });
@@ -107,3 +108,5 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/chats', chatRoutes);
 
 app.use('/api/friends', friendsRoutes);
+
+app.use('/api/trip-posts', tripPostsRoutes);
