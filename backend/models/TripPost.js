@@ -9,7 +9,7 @@ const TripPost = sequelize.define("TripPost", {
   },
   description: {
     type: DataTypes.TEXT,
-    allowNull: false,
+    allowNull: true, 
   },
   locationData: {
     type: DataTypes.JSON,
@@ -17,16 +17,16 @@ const TripPost = sequelize.define("TripPost", {
   },
   duration: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: true, 
   },
   price: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: true,
+    allowNull: true, 
   },
   photos: {
-    type: DataTypes.JSON, // tablica ścieżek do zdjęć
+    type: DataTypes.JSON,
+    allowNull: false, // zdjęcia są wymagane
     defaultValue: [],
-    allowNull: true,
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -37,6 +37,7 @@ const TripPost = sequelize.define("TripPost", {
     defaultValue: DataTypes.NOW,
   },
 });
+
 
 User.hasMany(TripPost, { foreignKey: "userId", onDelete: "CASCADE" });
 TripPost.belongsTo(User, { foreignKey: "userId" });

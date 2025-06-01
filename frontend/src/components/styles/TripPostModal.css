@@ -1,0 +1,193 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    overflow: hidden; /* ← blokuje przewijanie strony */
+  }
+  
+  .modal-content {
+    width: 90%;
+    height: 90vh;
+    max-width: 1100px;
+    background: white;
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+  
+  .modal-left {
+    flex: 1.2;
+    position: relative;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal-photo {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  
+  .modal-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  .modal-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .modal-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 10px 0;
+  }
+  
+  .modal-description {
+    white-space: pre-wrap; /* 🔁 zachowuje enter i zawija długie linie */
+    word-break: break-word; /* 🔨 łamie bardzo długie słowa */
+    line-height: 1.5;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 10px;
+    max-height: 200px; /* opcjonalnie */
+    overflow-y: auto; /* opcjonalnie, gdy opis jest długi */
+  }
+  
+
+  .modal-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  
+  .toggle-description {
+    border: none;
+    background: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+    padding-left: 4px;
+  }
+  
+  .modal-meta {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .modal-comments {
+    border-top: 1px solid #eee;
+    margin-top: 20px;
+    padding-top: 15px;
+    font-size: 14px;
+    color: #555;
+  }
+  
+  .modal-actions {
+    margin-top: auto;
+    display: flex;
+    gap: 20px;
+    font-size: 18px;
+  }
+
+  .gallery-dots {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+  }
+  
+  .gallery-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    cursor: pointer;
+  }
+  
+  .gallery-dots .dot.active {
+    background: white;
+  }
+  
+  .modal-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 30px;
+    color: white;
+    background: rgba(0, 0, 0, 0.3);
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .modal-arrow.left {
+    left: 10px;
+  }
+  
+  .modal-arrow.right {
+    right: 10px;
+  }
+  .empty-description {
+    font-style: italic;
+    color: #aaa;
+  }
+  .modal-dots {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+  }
+  .modal-dots .dot {
+    width: 8px;
+    height: 8px;
+    background: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .modal-dots .dot.active {
+    background: white;
+  }

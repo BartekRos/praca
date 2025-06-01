@@ -56,17 +56,26 @@
   
   .trippost-main-image {
     width: 100%;
-    max-height: 500px;
-    object-fit: cover;
+    height: 400px; /* lub np. 350px, dopasuj do reszty kafelka */
+    background-color: #fff;
+    object-fit: contain; /* 👈 zmiana z cover → contain */
+    object-position: center;
     border-radius: 8px;
     margin-bottom: 12px;
+    display: block;
   }
   
   .trippost-description {
+    white-space: pre-wrap; /* 🔁 zachowuje enter i zawija długie linie */
+    word-break: break-word; /* 🔨 łamie bardzo długie słowa */
+    line-height: 1.5;
     font-size: 15px;
-    color: #444;
-    margin-bottom: 15px;
-    white-space: pre-wrap;
+    color: #333;
+    margin-bottom: 10px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* 👈 przycięcie do 2 linii */
+    -webkit-box-orient: vertical;
   }
   
   .trippost-meta {
@@ -98,4 +107,62 @@
   .trippost-actions button:hover {
     transform: scale(1.2);
   }
+  .trippost-gallery {
+    position: relative;
+    width: 100%;
+    max-height: 500px;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .gallery-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.6);
+    border: none;
+    padding: 8px 14px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    z-index: 2;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+  
+  .gallery-arrow.left {
+    left: 10px;
+  }
+  
+  .gallery-arrow.right {
+    right: 10px;
+  }
+  
+  .gallery-arrow:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  .gallery-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 10;
+  }
+  .gallery-dots .dot {
+    width: 10px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .gallery-dots .dot.active {
+    background-color: #fff;
+  }
+  
   

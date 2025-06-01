@@ -42,6 +42,8 @@ GroupMessage.belongsTo(User, { foreignKey: 'senderId' });
 require('./models/Users');
 require('./models/Post');
 require('./models/UserActivity');
+require('./models/TripComment');
+require('./models/TripLike');
 
 dotenv.config();
 

@@ -3,12 +3,14 @@ import Navbar from "../components/Navbar";
 import AuthContext from "../context/AuthContext";
 import CreateTripPostSection from "../components/CreateTripPostSection";
 import TripPostCard from "../components/TripPostCard";
-import "./styles/HomePage.css"; // wspólny styl z HomePage
+import TripPostModal from "../components/TripPostModal";
+import "./styles/HomePage.css";
 
 const TripsPage = () => {
   const { user } = useContext(AuthContext);
   const [tripPosts, setTripPosts] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     fetchTripPosts();
@@ -34,7 +36,6 @@ const TripsPage = () => {
         },
         body: postData,
       });
-      
 
       const newPost = await res.json();
       setTripPosts(prev => [newPost, ...prev]);
@@ -43,6 +44,20 @@ const TripsPage = () => {
       console.error("❌ Błąd dodawania relacji:", err);
     }
   };
+
+  // 🔒 Zablokuj przewijanie tła, gdy modal jest aktywny
+  useEffect(() => {
+    if (selectedPost) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    // 🧹 Dodatkowo zabezpieczenie na wypadek błędów
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [selectedPost]);
 
   return (
     <>
@@ -65,12 +80,24 @@ const TripsPage = () => {
           ) : (
             <div className="posts-container">
               {tripPosts.map((post) => (
-                <TripPostCard key={post.id} post={post} />
+                <TripPostCard
+                  key={post.id}
+                  post={post}
+                  onClick={() => setSelectedPost(post)}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Modal przeniesiony na koniec DOM-u — nad wszystkim */}
+      {selectedPost && (
+        <TripPostModal
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+        />
+      )}
     </>
   );
 };
