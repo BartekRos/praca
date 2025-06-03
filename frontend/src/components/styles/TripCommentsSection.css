@@ -1,0 +1,112 @@
+.trip-comments-section {
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Komentarz jako całość */
+  .comment {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px 12px;
+    position: relative;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  
+  /* Autor komentarza */
+  .comment-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  
+  .comment-author img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Treść komentarza */
+  .comment-content pre {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #444;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
+  .toggle-button {
+    background: none;
+    border: none;
+    color: #0077cc;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 4px;
+    padding: 0;
+  }
+  
+  .toggle-button:hover {
+    text-decoration: underline;
+  }
+  
+  /* Przycisk usuwania */
+  .delete-button {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    color: #e53e3e;
+  }
+  
+  .delete-button:hover {
+    transform: scale(1.2);
+  }
+  
+  /* Pole do wpisywania nowego komentarza */
+  .comment-input {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .comment-input textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 60px;
+    max-height: 150px;
+  }
+  
+  .comment-input button {
+    align-self: flex-end;
+    padding: 6px 14px;
+    font-size: 14px;
+    background-color: #646566;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .comment-input button:hover {
+    background-color: #343435;
+  }
+  

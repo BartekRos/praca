@@ -9,7 +9,8 @@ const {
   addComment,
   getComments,
   deleteComment,
-  getLikesCount
+  getLikesCount,
+  checkLiked,
 } = require('../controllers/tripPostsController');
 
 router.get('/', getAllTripPosts);
@@ -21,5 +22,6 @@ router.delete('/comments/:commentId', authMiddleware, deleteComment);
 // 🆕 LAJKI
 router.post('/:postId/like', authMiddleware, toggleLike);
 router.get('/:postId/likes-count', getLikesCount);
+router.get('/:postId/liked', authMiddleware, checkLiked);
 
 module.exports = router;

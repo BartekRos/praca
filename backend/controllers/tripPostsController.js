@@ -23,6 +23,7 @@ exports.getAllTripPosts = async (req, res) => {
   }
 };
 
+
 exports.createTripPost = async (req, res) => {
   try {
     const { title } = req.body;
@@ -64,7 +65,6 @@ exports.createTripPost = async (req, res) => {
     res.status(500).json({ message: "Błąd serwera" });
   }
 };
-
 
 
 // GET komentarze posta
@@ -170,5 +170,22 @@ exports.toggleLike = async (req, res) => {
     res.status(500).json({ message: "Błąd serwera" });
   }
 };
+
+// Sprawdzenie czy użytkownik już polubił
+exports.checkLiked = async (req, res) => {
+  try {
+    const existing = await TripLike.findOne({
+      where: {
+        userId: req.user.id,
+        tripPostId: req.params.postId,
+      },
+    });
+    res.json({ liked: !!existing });
+  } catch (err) {
+    console.error("❌ Błąd sprawdzania lajku:", err);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+};
+
 
 exports.uploadPhotos = upload.array("photos");

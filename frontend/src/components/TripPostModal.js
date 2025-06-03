@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./styles/TripPostModal.css";
+import AuthContext from "../context/AuthContext";
+import TripCommentsSection from "./TripCommentsSection";
 
 const TripPostModal = ({ post, onClose }) => {
   const {
@@ -14,6 +16,10 @@ const TripPostModal = ({ post, onClose }) => {
 
   const [photoIndex, setPhotoIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const { user } = useContext(AuthContext);
+  const [likesCount, setLikesCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+
 
   useEffect(() => {
     // Zablokuj scrollowanie strony po otwarciu modala
@@ -23,6 +29,40 @@ const TripPostModal = ({ post, onClose }) => {
     };
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+  
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/trip-posts/${post.id}/likes-count`);
+        const data = await res.json();
+        setLikesCount(data.count);
+      } catch (err) {
+        console.error("❌ Błąd pobierania lajków:", err);
+      }
+    };
+  
+    const fetchLiked = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/trip-posts/${post.id}/liked`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const data = await res.json();
+        setLiked(data.liked);
+      } catch (err) {
+        console.error("❌ Błąd sprawdzania lajku:", err);
+      }
+    };
+  
+    fetchLikes();
+    if (user) fetchLiked();
+  
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [post.id, user]);
+  
+
   const handlePrev = () => {
     setPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
   };
@@ -30,6 +70,21 @@ const TripPostModal = ({ post, onClose }) => {
   const handleNext = () => {
     setPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
+
+  const handleLike = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/trip-posts/${post.id}/like`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await res.json();
+      setLiked(data.liked);
+      setLikesCount((prev) => prev + (data.liked ? 1 : -1));
+    } catch (err) {
+      console.error("❌ Błąd lajkowania:", err);
+    }
+  };
+  
 
   const handleBackdropClick = (e) => {
     const selection = window.getSelection();
@@ -127,13 +182,17 @@ const TripPostModal = ({ post, onClose }) => {
             </div>
 
             <div className="modal-comments">
-              <p><i>💬 Sekcja komentarzy (wkrótce)</i></p>
+              <TripCommentsSection postId={post.id} postAuthorId={author?.id} />
             </div>
           </div>
 
           <div className="modal-actions">
-            <button>❤️ 12</button>
-            <button>💬</button>
+            <button
+              className={`like-button ${liked ? "liked" : ""}`}
+              onClick={handleLike}
+            >
+              ❤️ {likesCount}
+            </button>
           </div>
         </div>
       </div>
