@@ -1,12 +1,8 @@
 .trip-comments-section {
-    margin-top: 20px;
-    max-height: 300px;
-    overflow-y: auto;
-    padding-right: 5px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
   
   /* Komentarz jako całość */
   .comment {
@@ -57,7 +53,53 @@
   .toggle-button:hover {
     text-decoration: underline;
   }
+
+  .comments-list-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-bottom: 10px;
+    max-height: 350px; /* możesz dostosować wysokość do potrzeb */
+  }
   
+  /* Pasek przewijania */
+  .comments-list-scrollable::-webkit-scrollbar {
+    width: 6px;
+  }
+  .comments-list-scrollable::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+
+  /* Input zawsze na dole */
+  .comment-input-fixed {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+  }
+
+  .comment-input-fixed textarea {
+    width: 95%;
+    resize: none;
+    font-size: 14px;
+    padding: 8px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  .comment-input-fixed button {
+    padding: 6px 12px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .comment-input-fixed button:hover {
+    background-color: #125da0;
+  }
+
   /* Przycisk usuwania */
   .delete-button {
     position: absolute;

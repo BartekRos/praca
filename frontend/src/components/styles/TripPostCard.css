@@ -164,5 +164,7 @@
   .gallery-dots .dot.active {
     background-color: #fff;
   }
-  
+  .like-button.liked {
+    color: red;
+  }
   

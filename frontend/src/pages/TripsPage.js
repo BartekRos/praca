@@ -11,6 +11,7 @@ const TripsPage = () => {
   const [tripPosts, setTripPosts] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [scrollToComment, setScrollToComment] = useState(false); // 🔁
 
   useEffect(() => {
     fetchTripPosts();
@@ -53,11 +54,24 @@ const TripsPage = () => {
       document.body.style.overflow = "auto";
     }
 
-    // 🧹 Dodatkowo zabezpieczenie na wypadek błędów
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [selectedPost]);
+
+  // 🔁 Scrolluj do komentarza po otwarciu modala
+  useEffect(() => {
+    if (scrollToComment) {
+      setTimeout(() => {
+        const textarea = document.querySelector(".trip-comments-section textarea");
+        if (textarea) {
+          textarea.scrollIntoView({ behavior: "smooth", block: "center" });
+          textarea.focus();
+        }
+        setScrollToComment(false); // reset flagi
+      }, 150);
+    }
+  }, [scrollToComment]);
 
   return (
     <>
@@ -84,6 +98,10 @@ const TripsPage = () => {
                   key={post.id}
                   post={post}
                   onClick={() => setSelectedPost(post)}
+                  onCommentClick={() => {
+                    setSelectedPost(post);
+                    setScrollToComment(true);
+                  }}
                 />
               ))}
             </div>
@@ -91,7 +109,6 @@ const TripsPage = () => {
         </div>
       </div>
 
-      {/* Modal przeniesiony na koniec DOM-u — nad wszystkim */}
       {selectedPost && (
         <TripPostModal
           post={selectedPost}

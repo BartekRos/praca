@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./styles/TripPostCard.css";
+import AuthContext from "../context/AuthContext";
 
-const TripPostCard = ({ post, onClick }) => {
+const TripPostCard = ({ post, onClick, onCommentClick }) => {
   const {
     title,
     description,
@@ -10,9 +11,56 @@ const TripPostCard = ({ post, onClick }) => {
     photos,
     createdAt,
     User: author,
+    id: postId,
   } = post;
 
+  const { user } = useContext(AuthContext);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [likesCount, setLikesCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+
+  // Pobieranie liczby lajków i statusu użytkownika
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/likes-count`);
+        const data = await res.json();
+        setLikesCount(data.count);
+      } catch (err) {
+        console.error("❌ Błąd pobierania lajków:", err);
+      }
+    };
+
+    const fetchLiked = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/liked`, {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        });
+        const data = await res.json();
+        setLiked(data.liked);
+      } catch (err) {
+        console.error("❌ Błąd sprawdzania lajku:", err);
+      }
+    };
+
+    fetchLikes();
+    if (user) fetchLiked();
+  }, [postId, user]);
+
+  const handleLike = async (e) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/like`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await res.json();
+      setLiked(data.liked);
+      setLikesCount((prev) => prev + (data.liked ? 1 : -1));
+    } catch (err) {
+      console.error("❌ Błąd lajkowania:", err);
+    }
+  };
 
   const handlePrev = (e) => {
     e.stopPropagation();
@@ -53,9 +101,7 @@ const TripPostCard = ({ post, onClick }) => {
 
       <h3 className="trippost-title">{title}</h3>
 
-      <p className="trippost-description">
-        {description}
-      </p>
+      <p className="trippost-description">{description}</p>
 
       {Array.isArray(photos) && photos.length > 0 && (
         <div className="trippost-gallery">
@@ -96,8 +142,21 @@ const TripPostCard = ({ post, onClick }) => {
       </div>
 
       <div className="trippost-actions">
-        <button className="like-button" onClick={(e) => e.stopPropagation()}>❤️</button>
-        <button className="comment-button" onClick={(e) => e.stopPropagation()}>💬</button>
+        <button
+          className={`like-button ${liked ? "liked" : ""}`}
+          onClick={handleLike}
+        >
+          ❤️ {likesCount}
+        </button>
+        <button
+          className="comment-button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCommentClick?.(); // wywołanie przewinięcia do komentarzy w modalu
+          }}
+        >
+          💬
+        </button>
       </div>
     </div>
   );

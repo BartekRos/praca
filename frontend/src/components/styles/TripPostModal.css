@@ -82,7 +82,7 @@
     font-size: 15px;
     color: #333;
     margin-bottom: 10px;
-    max-height: 200px; /* opcjonalnie */
+    max-height: 100px; /* opcjonalnie */
     overflow-y: auto; /* opcjonalnie, gdy opis jest długi */
   }
   

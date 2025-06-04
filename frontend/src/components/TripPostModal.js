@@ -10,7 +10,6 @@ const TripPostModal = ({ post, onClose }) => {
     photos,
     duration,
     price,
-    createdAt,
     User: author,
   } = post;
 
@@ -178,7 +177,6 @@ const TripPostModal = ({ post, onClose }) => {
             <div className="modal-meta">
               {duration && <span>🕒 {duration} dni</span>}
               {price && <span>💰 {parseFloat(price)} PLN</span>}
-              {createdAt && <span>📅 {new Date(createdAt).toLocaleDateString("pl-PL")}</span>}
             </div>
 
             <div className="modal-comments">
