@@ -137,7 +137,7 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
 
       <div className="trippost-meta">
         {duration && <span>Spędzonych dni: {duration}</span>}
-        {price && <span>Koszt: {parseFloat(price)} PLN</span>}
+        {price && <span>Koszt: {parseFloat(price)} PLN</span>} | 
         {createdAt && <span>Dodano: {new Date(createdAt).toLocaleDateString("pl-PL")}</span>}
       </div>
 

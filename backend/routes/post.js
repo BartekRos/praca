@@ -8,14 +8,47 @@ const router = express.Router();
 // Pobranie wszystkich aktywnych postów
 router.get("/", async (req, res) => {
   try {
-    const posts = await Post.findAll({ where: { isActive: true }, include: ["User"] });
-    console.log("Pobrane posty:", posts);
+    const where = { isActive: true };
+
+    if (req.query.userId) {
+      where.userId = req.query.userId;
+    }
+
+    const posts = await Post.findAll({
+      where,
+      include: {
+        model: User,
+        attributes: ['id', 'username', 'profilePicture']
+      },
+      order: [["createdAt", "DESC"]]
+    });
+
     res.json(posts);
   } catch (error) {
     console.error("Błąd pobierania postów:", error);
     res.status(500).json({ message: "Błąd serwera", error: error.message });
   }
 });
+
+// Pobranie postów konkretnego użytkownika (używane w profilach)
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const posts = await Post.findAll({
+      where: { userId: req.params.userId, isActive: true },
+      include: {
+        model: User,
+        attributes: ['id', 'username', 'profilePicture']
+      },
+      order: [["createdAt", "DESC"]]
+    });
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Błąd pobierania postów użytkownika:", error);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+});
+
 
 // Pobranie pojedynczego posta
 router.get("/:id", async (req, res) => {

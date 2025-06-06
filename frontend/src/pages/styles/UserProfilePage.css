@@ -1,0 +1,85 @@
+.profile-page {
+  padding: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  
+}
+
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.bio-box {
+  flex: 1;
+  min-width: 200px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.profile-avatar img {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ccc;
+}
+
+.profile-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-actions button {
+  padding: 10px 18px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.profile-actions button:hover {
+  background-color: #f2f2f2;
+}
+
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.profile-tabs button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  opacity: 0.5;
+}
+
+.profile-tabs button.active {
+  border-bottom: 2px solid black;
+  opacity: 1;
+}
+
+.profile-tabs img {
+  width: 28px;
+  height: 28px;
+}
+
+.profile-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+

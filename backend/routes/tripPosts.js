@@ -23,5 +23,26 @@ router.delete('/comments/:commentId', authMiddleware, deleteComment);
 router.post('/:postId/like', authMiddleware, toggleLike);
 router.get('/:postId/likes-count', getLikesCount);
 router.get('/:postId/liked', authMiddleware, checkLiked);
+// 🆕 Pobieranie postów danego użytkownika
+router.get('/user/:userId', async (req, res) => {
+  const TripPost = require('../models/TripPost');
+  const User = require('../models/Users');
+
+  try {
+    const posts = await TripPost.findAll({
+      where: { userId: req.params.userId },
+      include: {
+        model: User,
+        attributes: ['id', 'username', 'profilePicture'],
+      },
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.json(posts);
+  } catch (error) {
+    console.error("❌ Błąd pobierania postów użytkownika:", error);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+});
 
 module.exports = router;

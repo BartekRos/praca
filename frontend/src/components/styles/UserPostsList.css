@@ -1,0 +1,41 @@
+.user-posts-section {
+    padding: 20px;
+  }
+  
+  .post-switcher {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .switch-icon {
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+  
+  .switch-icon.active {
+    opacity: 1;
+  }
+  
+  .user-posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .travelmate-post {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .no-posts {
+    text-align: center;
+    color: #777;
+  }
+  
