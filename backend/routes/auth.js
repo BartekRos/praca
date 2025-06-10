@@ -1075,18 +1075,9 @@ router.post(
  */
 router.put(
   '/update-profile',
-  [
-    body('city').optional().notEmpty().withMessage('Miasto nie może być puste'),
-    body('profilePicture').optional().isURL().withMessage('Zdjęcie profilowe musi być poprawnym URL-em'),
-  ],
-  async (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  },
-  authMiddleware, updateProfile
+  authMiddleware,
+  upload.single('profilePicture'), // obsługa pliku
+  updateProfile
 );
 
 //Endpoint usuwania konta

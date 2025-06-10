@@ -5,6 +5,7 @@ import AuthContext from "../context/AuthContext";
 import Navbar from "../components/Navbar";
 import TripPostCard from "../components/TripPostCard";
 import TripPostModal from "../components/TripPostModal";
+import CompanionPostCard from "../components/CompanionPostCard";
 import "./styles/UserProfilePage.css";
 
 import planeIcon from "../assets/icons/plane.png";
@@ -16,11 +17,12 @@ const UserProfilePage = () => {
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
-  const [activeTab, setActiveTab] = useState("trip"); // "trip" | "companion"
+  const [activeTab, setActiveTab] = useState("trip");
   const [tripPosts, setTripPosts] = useState([]);
   const [companionPosts, setCompanionPosts] = useState([]);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [scrollToComments, setScrollToComments] = useState(false); // ⬅️ Dodane
+  const [scrollToComments, setScrollToComments] = useState(false);
+  const [isFriend, setIsFriend] = useState(false); // ⬅️ nowy stan
 
   useEffect(() => {
     if (!user?.token || !userId) return;
@@ -58,10 +60,42 @@ const UserProfilePage = () => {
       }
     };
 
+    const checkFriendship = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/friends", {
+          headers: { Authorization: `Bearer ${user.token}` },
+        });
+        const friendIds = res.data.map((f) => f.id);
+        setIsFriend(friendIds.includes(+userId));
+      } catch (err) {
+        console.error("❌ Błąd sprawdzania znajomości:", err);
+      }
+    };
+
     fetchProfile();
     fetchTripPosts();
     fetchCompanionPosts();
+    checkFriendship(); // ⬅️ sprawdzenie czy znajomy
   }, [userId, user, navigate]);
+
+  const handleSendRequest = async () => {
+    try {
+      await axios.post(
+        "http://localhost:5000/api/friends/request",
+        { friendId: userId },
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      alert("Zaproszenie wysłane");
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Nie udało się wysłać zaproszenia";
+      alert(msg);
+      console.error("❌ Błąd wysyłania zaproszenia:", err);
+    }
+  };
+
+  const handleMessage = () => {
+    navigate(`/messages?userId=${userId}`);
+  };
 
   if (!profile) return <div>Ładowanie profilu...</div>;
 
@@ -85,8 +119,10 @@ const UserProfilePage = () => {
           </div>
 
           <div className="profile-actions">
-            <button>Dodaj do znajomych</button>
-            <button>Napisz wiadomość</button>
+            {!isFriend && (
+              <button onClick={handleSendRequest}>Dodaj do znajomych</button>
+            )}
+            <button onClick={handleMessage}>Napisz wiadomość</button>
           </div>
         </div>
 
@@ -124,10 +160,7 @@ const UserProfilePage = () => {
 
           {activeTab === "companion" &&
             companionPosts.map((post) => (
-              <div key={post.id} className="companion-post">
-                <h3>{post.title}</h3>
-                <p>{post.description}</p>
-              </div>
+              <CompanionPostCard key={post.id} post={post} />
             ))}
         </div>
       </div>
@@ -139,7 +172,7 @@ const UserProfilePage = () => {
             setSelectedPost(null);
             setScrollToComments(false);
           }}
-          scrollToComments={scrollToComments} // ⬅️ kluczowy prop
+          scrollToComments={scrollToComments}
         />
       )}
     </>

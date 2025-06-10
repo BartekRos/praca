@@ -109,30 +109,33 @@ exports.login = async (req, res) => {
 //aktualizacja profilu
 exports.updateProfile = async (req, res) => {
   try {
-    const { id } = req.user; // Zakładamy, że id użytkownika jest w tokenie
-    const { city, profilePicture } = req.body;
+    const { city, age, newPassword, currentPassword } = req.body;
+    const userId = req.user.id;
+    const profilePicture = req.file ? req.file.filename : null;
 
-    // Znalezienie użytkownika
-    const user = await User.findByPk(id);
-    if (!user) {
-      return res.status(404).json({ message: 'Użytkownik nie został znaleziony' });
-    }
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: "Użytkownik nie znaleziony" });
 
-    // Aktualizacja danych użytkownika
+    // Sprawdzenie poprawności hasła
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Nieprawidłowe aktualne hasło" });
+
+    // Aktualizacje pól
     if (city) user.city = city;
+    if (age) user.age = age;
+    if (newPassword) user.password = await bcrypt.hash(newPassword, 10);
     if (profilePicture) user.profilePicture = profilePicture;
 
     await user.save();
 
-    // Usuń hasło z odpowiedzi
     const { password, ...userWithoutPassword } = user.toJSON();
-
-    res.status(200).json({ message: 'Profil został zaktualizowany', user: userWithoutPassword });
+    res.status(200).json({ message: "Profil został zaktualizowany", user: userWithoutPassword });
   } catch (error) {
-    console.error('Błąd aktualizacji profilu:', error);
-    res.status(500).json({ message: 'Błąd serwera' });
+    console.error("Błąd aktualizacji profilu:", error);
+    res.status(500).json({ message: "Błąd serwera" });
   }
 };
+
 
 // Usuwanie konta z potwierdzeniem hasła
 exports.deleteAccount = async (req, res) => {

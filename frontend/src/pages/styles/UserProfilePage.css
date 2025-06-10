@@ -1,3 +1,12 @@
+body {
+  margin: 0;
+  background-color: #faf8f4;
+  background-image: url('mapa.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
 .profile-page {
   padding: 40px;
   max-width: 1000px;
@@ -81,5 +90,5 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  margin-left: -43px;
 }
-

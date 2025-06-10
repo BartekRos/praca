@@ -77,7 +77,7 @@ exports.getComments = async (req, res) => {
         model: User,
         attributes: ['id', 'username', 'profilePicture']
       },
-      order: [['createdAt', 'ASC']]
+      order: [['createdAt', 'DESC']]
     });
     res.json(comments);
   } catch (err) {

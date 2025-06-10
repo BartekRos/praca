@@ -5,14 +5,35 @@ const { Op } = require('sequelize');
 // Wysyłanie zaproszenia
 exports.sendFriendRequest = async (req, res) => {
   try {
-    await Friendship.create({
-      userId: req.user.id,
-      friendId: req.body.friendId,
+    const { friendId } = req.body;
+    const userId = req.user.id;
+
+    // 🔍 Sprawdź, czy już istnieje zaproszenie lub znajomość
+    const existing = await Friendship.findOne({
+      where: {
+        [Op.or]: [
+          { userId, friendId },
+          { userId: friendId, friendId: userId }
+        ]
+      }
     });
-    res.json({ message: 'Zaproszenie wysłane' });
+
+    if (existing) {
+      if (existing.status === "pending") {
+        return res.status(400).json({ message: "Poczekaj aż użytkownik odpowie na twoją prośbę" });
+      }
+      if (existing.status === "accepted") {
+        return res.status(400).json({ message: "Użytkownik jest już twoim znajomym" });
+      }
+    }
+
+    // Jeśli nie ma żadnej relacji — utwórz zaproszenie
+    await Friendship.create({ userId, friendId });
+
+    res.json({ message: "Zaproszenie wysłane" });
   } catch (error) {
-    console.error('Błąd wysyłania zaproszenia:', error);
-    res.status(500).json({ message: 'Błąd serwera' });
+    console.error("Błąd wysyłania zaproszenia:", error);
+    res.status(500).json({ message: "Błąd serwera" });
   }
 };
 
