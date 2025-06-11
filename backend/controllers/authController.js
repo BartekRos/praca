@@ -1,6 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/Users'); // Upewnij się, że ścieżka jest poprawna
+const { Op } = require("sequelize");
+const Chat = require("../models/Chat");
+const Message = require("../models/Message");
+const GroupMessage = require("../models/GroupMessage");
+const ChatParticipant = require("../models/ChatParticipant");
+const Conversation = require("../models/Conversation");
+const Friendship = require("../models/Friendships");
 
 // Rejestracja użytkownika
 exports.register = async (req, res) => {
@@ -156,6 +163,22 @@ exports.deleteAccount = async (req, res) => {
     }
 
     // Usunięcie konta
+    // Usuń powiązane wiadomości i czaty
+    await Message.destroy({ where: { senderId: id } });
+    await GroupMessage.destroy({ where: { senderId: id } });
+    await ChatParticipant.destroy({ where: { userId: id } });
+    await Conversation.destroy({
+      where: { [Op.or]: [{ user1Id: id }, { user2Id: id }] },
+    });
+    await Chat.destroy({ where: { createdBy: id } });
+    await Friendship.destroy({
+      where: {
+        [Op.or]: [
+          { userId: id },
+          { friendId: id },
+        ],
+      },
+    });
     await user.destroy();
 
     res.status(200).json({ message: 'Konto zostało trwale usunięte' });

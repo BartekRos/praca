@@ -11,6 +11,7 @@ const {
   deleteComment,
   getLikesCount,
   checkLiked,
+  deleteTripPost,
 } = require('../controllers/tripPostsController');
 
 router.get('/', getAllTripPosts);
@@ -27,6 +28,7 @@ router.get('/:postId/liked', authMiddleware, checkLiked);
 router.get('/user/:userId', async (req, res) => {
   const TripPost = require('../models/TripPost');
   const User = require('../models/Users');
+router.delete('/:id', authMiddleware, deleteTripPost);
 
   try {
     const posts = await TripPost.findAll({

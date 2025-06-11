@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import AuthContext from "../context/AuthContext";
+import axios from "axios";
+import "./styles/CompanionPostCard.css"; // dodaj jeśli masz osobny plik css
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -14,6 +16,7 @@ L.Icon.Default.mergeOptions({
 const CompanionPostCard = ({ post }) => {
   const { user } = useContext(AuthContext);
   const [expanded, setExpanded] = useState(false);
+  const isOwner = user?.id === post.User?.id;
 
   const handleToggle = () => {
     const selection = window.getSelection();
@@ -22,19 +25,35 @@ const CompanionPostCard = ({ post }) => {
     }
   };
 
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    const confirmed = window.confirm("Czy na pewno chcesz usunąć ten post?");
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/posts/${post.id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      window.location.reload(); // lub użyj callbacku
+    } catch (err) {
+      console.error("❌ Błąd usuwania posta:", err);
+      alert("Nie udało się usunąć posta");
+    }
+  };
+
   return (
-    <div
-      className={`post ${expanded ? "expanded" : ""}`}
-      onClick={handleToggle}
-    >
-      <div
-        className="post-header"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+    <div className={`post ${expanded ? "expanded" : ""}`} onClick={handleToggle} style={{ position: "relative" }}>
+      {isOwner && (
+        <div
+          className="delete-post1-button"
+          title="Usuń post"
+          onClick={handleDelete}
+        >
+          ❌
+        </div>
+      )}
+
+      <div className="post-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div
           className="user-info"
           onClick={(e) => {

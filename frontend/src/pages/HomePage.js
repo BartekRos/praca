@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "./styles/HomePage.css";
 import AuthContext from "../context/AuthContext";
+import axios from "axios";
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
@@ -47,21 +48,36 @@ const HomePage = () => {
         },
         body: JSON.stringify(postData),
       });
-
+  
       if (!response.ok) throw new Error("Nie udało się dodać posta");
-
+  
       const newPost = await response.json();
-
-      if (newPost && newPost.User) {
-        setPosts((prev) => [newPost, ...prev]);
-        setShowCreateForm(false);
-      } else {
-        console.warn("Nowy post nie zawiera użytkownika. Odświeżam z serwera.");
-        fetchPosts();
-      }
+  
+      // ✅ Ręczne przypisanie użytkownika do nowego posta
+      const completePost = { ...newPost, User: user };
+  
+      setPosts((prev) => [completePost, ...prev]);
+      setShowCreateForm(false);
     } catch (error) {
       console.error("Błąd dodawania posta:", error);
       alert("Wystąpił błąd przy dodawaniu posta");
+    }
+  };
+  
+
+  const handleDeletePost = async (e, postId) => {
+    e.stopPropagation();
+    const confirmed = window.confirm("Czy na pewno chcesz usunąć ten post?");
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setPosts((prev) => prev.filter((post) => post.id !== postId));
+    } catch (err) {
+      console.error("❌ Błąd usuwania posta:", err);
+      alert("Nie udało się usunąć posta");
     }
   };
 
@@ -99,7 +115,28 @@ const HomePage = () => {
                       toggleExpand(post.id);
                     }
                   }}
+                  style={{ position: "relative" }}
                 >
+                  {user?.id === post.User?.id && (
+                    <div
+                      className="delete-post-button"
+                      title="Usuń post"
+                      onClick={(e) => handleDeletePost(e, post.id)}
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        cursor: "pointer",
+                        fontSize: "22px",
+                        color: "crimson",
+                        fontWeight: "bold",
+                        zIndex: 2,
+                      }}
+                    >
+                      ❌
+                    </div>
+                  )}
+
                   <div className="post-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <div
                       className="user-info"

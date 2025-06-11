@@ -187,5 +187,26 @@ exports.checkLiked = async (req, res) => {
   }
 };
 
+// USUŃ TripPost (tylko właściciel)
+exports.deleteTripPost = async (req, res) => {
+  try {
+    const post = await TripPost.findByPk(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post nie znaleziony" });
+    }
+
+    if (post.userId !== req.user.id) {
+      return res.status(403).json({ message: "Brak uprawnień do usunięcia posta" });
+    }
+
+    await post.destroy();
+    res.json({ message: "Post usunięty" });
+  } catch (err) {
+    console.error("❌ Błąd usuwania TripPosta:", err);
+    res.status(500).json({ message: "Błąd serwera" });
+  }
+};
+
 
 exports.uploadPhotos = upload.array("photos");

@@ -195,3 +195,20 @@
   transform: scale(1.15);
   transition: transform 0.2s ease;
 }
+
+.delete-post-button {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 10px;
+  transform: scale(0.6); /* 👈 faktycznie zmniejsza wielkość nawet emoji */
+  color: crimson;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10;
+  transition: transform 0.15s ease;
+}
+
+.delete-post-button:hover {
+  transform: scale(0.8);
+}

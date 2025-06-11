@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import "./styles/TripPostCard.css";
 import AuthContext from "../context/AuthContext";
+import axios from "axios";
 
 const TripPostCard = ({ post, onClick, onCommentClick }) => {
   const {
@@ -18,8 +19,8 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [likesCount, setLikesCount] = useState(0);
   const [liked, setLiked] = useState(false);
+  const isOwner = user?.id === author?.id;
 
-  // Pobieranie liczby lajków i statusu użytkownika
   useEffect(() => {
     const fetchLikes = async () => {
       try {
@@ -62,30 +63,64 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
     }
   };
 
-  const handlePrev = (e) => {
+  const handleDelete = async (e) => {
     e.stopPropagation();
+    const confirmed = window.confirm("Czy na pewno chcesz usunąć ten post?");
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(`http://localhost:5000/api/trip-posts/${postId}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      window.location.reload();
+    } catch (err) {
+      console.error("❌ Błąd usuwania posta:", err);
+      alert("Nie udało się usunąć posta");
+    }
+  };
+
+  const handlePrev = () => {
     setCurrentPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
   };
 
-  const handleNext = (e) => {
-    e.stopPropagation();
+  const handleNext = () => {
     setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
   const handleClick = (e) => {
     const selection = window.getSelection();
     const clickedEl = e.target;
-
     const isControl = clickedEl.closest("button, .gallery-arrow, .dot, a");
     const isSelecting = selection && selection.toString().length > 0;
 
     if (!isControl && !isSelecting) {
-      onClick(); // tylko jeśli nie kliknięto w kontrolkę ani nie zaznaczano tekstu
+      onClick();
     }
   };
 
   return (
-    <div className="trippost-card" onClick={handleClick}>
+    <div className="trippost-card" onClick={handleClick} style={{ position: "relative" }}>
+  {isOwner && (
+    <div
+      className="delete-post-button"
+      title="Usuń post"
+      onClick={handleDelete}
+      style={{
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        cursor: "pointer",
+        fontSize: "22px",
+        color: "crimson",
+        fontWeight: "bold",
+        zIndex: 10, // może być więcej jeśli trzeba
+      }}
+    >
+      ❌
+    </div>
+  )}
+
+
       <div className="trippost-header">
         <a href={`/profile/${author?.id}`} onClick={(e) => e.stopPropagation()}>
           <img
@@ -100,7 +135,6 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
       </div>
 
       <h3 className="trippost-title">{title}</h3>
-
       <p className="trippost-description">{description}</p>
 
       {Array.isArray(photos) && photos.length > 0 && (
@@ -112,10 +146,10 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
           />
           {photos.length > 1 && (
             <>
-              <button className="gallery-arrow left" onClick={handlePrev}>
+              <button className="gallery-arrow left" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
                 ‹
               </button>
-              <button className="gallery-arrow right" onClick={handleNext}>
+              <button className="gallery-arrow right" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
                 ›
               </button>
               <div className="gallery-dots">
@@ -137,7 +171,7 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
 
       <div className="trippost-meta">
         {duration && <span>Spędzonych dni: {duration}</span>}
-        {price && <span>Koszt: {parseFloat(price)} PLN</span>} | 
+        {price && <span>Koszt: {parseFloat(price)} PLN</span>} |{" "}
         {createdAt && <span>Dodano: {new Date(createdAt).toLocaleDateString("pl-PL")}</span>}
       </div>
 
@@ -152,7 +186,7 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
           className="comment-button"
           onClick={(e) => {
             e.stopPropagation();
-            onCommentClick?.(); // wywołanie przewinięcia do komentarzy w modalu
+            onCommentClick?.();
           }}
         >
           💬

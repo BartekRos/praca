@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useEffect, useState, useContext, useCallback} from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import AuthContext from "../context/AuthContext";
 import Navbar from "../components/Navbar";
@@ -21,6 +22,10 @@ const ProfilePage = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [scrollToComments, setScrollToComments] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -83,6 +88,7 @@ const ProfilePage = () => {
 
           <div className="profile-actions">
             <button onClick={() => setShowEditModal(true)}>Edytuj dane</button>
+            <button onClick={() => setShowDeleteModal(true)}>Usuń konto</button>
           </div>
         </div>
 
@@ -102,26 +108,36 @@ const ProfilePage = () => {
         </div>
 
         <div className="profile-content">
-          {activeTab === "trip" &&
-            tripPosts.map((post) => (
-              <TripPostCard
-                key={post.id}
-                post={post}
-                onClick={() => {
-                  setSelectedPost(post);
-                  setScrollToComments(false);
-                }}
-                onCommentClick={() => {
-                  setSelectedPost(post);
-                  setScrollToComments(true);
-                }}
-              />
-            ))}
+          {activeTab === "trip" && (
+            tripPosts.length > 0 ? (
+              tripPosts.map((post) => (
+                <TripPostCard
+                  key={post.id}
+                  post={post}
+                  onClick={() => {
+                    setSelectedPost(post);
+                    setScrollToComments(false);
+                  }}
+                  onCommentClick={() => {
+                    setSelectedPost(post);
+                    setScrollToComments(true);
+                  }}
+                />
+              ))
+            ) : (
+              <p className="no-posts-message">Brak utworzonych postów</p>
+            )
+          )}
 
-          {activeTab === "companion" &&
-            companionPosts.map((post) => (
-              <CompanionPostCard key={post.id} post={post} />
-            ))}
+          {activeTab === "companion" && (
+            companionPosts.length > 0 ? (
+              companionPosts.map((post) => (
+                <CompanionPostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <p className="no-posts-message">Brak utworzonych postów</p>
+            )
+          )}
         </div>
       </div>
 
@@ -135,6 +151,45 @@ const ProfilePage = () => {
           scrollToComments={scrollToComments}
         />
       )}
+      {showDeleteModal && (
+  <div className="modal-backdrop" onClick={() => setShowDeleteModal(false)}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="edit-profile-form">
+        <h3>Czy na pewno chcesz usunąć konto?</h3>
+        <p>Ta akcja jest nieodwracalna.</p>
+        <label>Potwierdź hasłem:</label>
+        <input
+          type="password"
+          value={deletePassword}
+          onChange={(e) => setDeletePassword(e.target.value)}
+        />
+        {deleteError && <p className="edit-message error">{deleteError}</p>}
+        <div className="edit-form-buttons">
+          <button
+            onClick={async () => {
+              try {
+                await axios.delete("http://localhost:5000/api/auth/delete-account", {
+                  headers: {
+                    Authorization: `Bearer ${user.token}`,
+                  },
+                  data: { password: deletePassword },
+                });
+                localStorage.removeItem("user");
+                setUser(null);
+                navigate("/login");
+              } catch (err) {
+                setDeleteError(err?.response?.data?.message || "Błąd podczas usuwania konta");
+              }
+            }}
+          >
+            Potwierdź usunięcie
+          </button>
+          <button onClick={() => setShowDeleteModal(false)}>Anuluj</button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {showEditModal && (
         <div className="modal-backdrop" onClick={() => setShowEditModal(false)}>

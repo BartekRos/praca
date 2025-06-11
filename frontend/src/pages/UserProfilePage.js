@@ -142,26 +142,36 @@ const UserProfilePage = () => {
         </div>
 
         <div className="profile-content">
-          {activeTab === "trip" &&
-            tripPosts.map((post) => (
-              <TripPostCard
-                key={post.id}
-                post={post}
-                onClick={() => {
-                  setSelectedPost(post);
-                  setScrollToComments(false);
-                }}
-                onCommentClick={() => {
-                  setSelectedPost(post);
-                  setScrollToComments(true);
-                }}
-              />
-            ))}
+          {activeTab === "trip" && (
+            tripPosts.length > 0 ? (
+              tripPosts.map((post) => (
+                <TripPostCard
+                  key={post.id}
+                  post={post}
+                  onClick={() => {
+                    setSelectedPost(post);
+                    setScrollToComments(false);
+                  }}
+                  onCommentClick={() => {
+                    setSelectedPost(post);
+                    setScrollToComments(true);
+                  }}
+                />
+              ))
+            ) : (
+              <p className="no-posts-message">Brak utworzonych postów</p>
+            )
+          )}
 
-          {activeTab === "companion" &&
-            companionPosts.map((post) => (
-              <CompanionPostCard key={post.id} post={post} />
-            ))}
+          {activeTab === "companion" && (
+            companionPosts.length > 0 ? (
+              companionPosts.map((post) => (
+                <CompanionPostCard key={post.id} post={post} />
+              ))
+            ) : (
+              <p className="no-posts-message">Brak utworzonych postów</p>
+            )
+          )}
         </div>
       </div>
 

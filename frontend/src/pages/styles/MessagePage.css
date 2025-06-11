@@ -286,4 +286,9 @@
   color: red;
   font-size: 10px;
   cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.delete-btn:hover {
+  transform: scale(1.03);
 }
