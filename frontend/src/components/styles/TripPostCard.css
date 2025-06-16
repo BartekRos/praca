@@ -10,7 +10,11 @@
     padding: 20px;
     transition: transform 0.2s ease;
     min-height: 200px
-    
+  }
+
+  .trippost-card {
+    position: relative;   /* przycisk ❌ trzyma się karty */
+    overflow: hidden;     /* (opcjonalnie) nic nie wystaje poza kartę */
   }
   
 .trippost-card:hover {
@@ -168,3 +172,19 @@
     color: red;
   }
   
+  .delete-post3-button {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 10px;
+    transform: scale(1); /* 👈 faktycznie zmniejsza wielkość nawet emoji */
+    color: crimson;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.15s ease;
+  }
+  
+  .delete-post3-button:hover {
+    transform: scale(1.2);
+  }

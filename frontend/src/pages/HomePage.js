@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import Navbar from "../components/Navbar";
 import CreatePostSection from "../components/CreatePostSection";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
@@ -10,9 +10,19 @@ import axios from "axios";
 
 const HomePage = () => {
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [expandedPostId, setExpandedPostId] = useState(null);
+  const [filters, setFilters] = useState({
+    location: "",
+    maxPrice: "",
+    date: "",
+    duration: "",
+    maxPeople: "",
+  });
+
   const { user } = useContext(AuthContext);
+  const newPostRef = useRef(null);
 
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
@@ -32,10 +42,37 @@ const HomePage = () => {
       if (Array.isArray(data)) {
         const sorted = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setPosts(sorted);
+        setFilteredPosts(sorted);
       }
     } catch (error) {
       console.error("Błąd pobierania postów:", error);
     }
+  };
+
+  const applyFiltersToList = (list, filters) => {
+    return list.filter((post) => {
+      const { location, maxPrice, date, duration, maxPeople } = filters;
+      const titleMatch = location
+        ? post.title.toLowerCase().includes(location.toLowerCase())
+        : true;
+      const priceMatch = maxPrice
+        ? parseFloat(maxPrice) >= post.priceFrom && parseFloat(maxPrice) <= post.priceTo
+        : true;
+      const dateMatch = date ? post.travelDate?.startsWith(date) : true;
+      const durationMatch = duration ? +duration === post.duration : true;
+      const peopleMatch = maxPeople ? +maxPeople === post.maxPeople : true;
+
+      return titleMatch && priceMatch && dateMatch && durationMatch && peopleMatch;
+    });
+  };
+
+  const applyFilters = () => {
+    const result = applyFiltersToList(posts, filters);
+    setFilteredPosts(result);
+  };
+
+  const handleFilterChange = (field, value) => {
+    setFilters((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleCreatePost = async (postData) => {
@@ -52,12 +89,21 @@ const HomePage = () => {
       if (!response.ok) throw new Error("Nie udało się dodać posta");
   
       const newPost = await response.json();
-  
-      // ✅ Ręczne przypisanie użytkownika do nowego posta
       const completePost = { ...newPost, User: user };
   
-      setPosts((prev) => [completePost, ...prev]);
+      setPosts((prev) => {
+        const updated = [completePost, ...prev];
+        const filtered = applyFiltersToList(updated, filters);
+        setFilteredPosts(filtered);
+        return updated;
+      });
+  
       setShowCreateForm(false);
+  
+      // ⬇️ przewiń stronę na samą górę
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 100);
     } catch (error) {
       console.error("Błąd dodawania posta:", error);
       alert("Wystąpił błąd przy dodawaniu posta");
@@ -74,7 +120,13 @@ const HomePage = () => {
       await axios.delete(`http://localhost:5000/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setPosts((prev) => prev.filter((post) => post.id !== postId));
+
+      setPosts((prev) => {
+        const updated = prev.filter((post) => post.id !== postId);
+        const filtered = applyFiltersToList(updated, filters);
+        setFilteredPosts(filtered);
+        return updated;
+      });
     } catch (err) {
       console.error("❌ Błąd usuwania posta:", err);
       alert("Nie udało się usunąć posta");
@@ -85,15 +137,57 @@ const HomePage = () => {
     setExpandedPostId(expandedPostId === postId ? null : postId);
   };
 
+  const handleSaveFilters = () => {
+    applyFilters();
+  };
+
   return (
     <>
       <Navbar />
       <div className="homepage-container">
         <div className="sidebar-left">
           {!showCreateForm && (
-            <button className="add-post-sidebar" onClick={() => setShowCreateForm(true)}>
-              + Dodaj post
-            </button>
+            <>
+              <button className="add-post-sidebar" onClick={() => setShowCreateForm(true)}>
+                + Dodaj post
+              </button>
+
+              <div className="filters-container">
+                <h4>Filtry</h4>
+                <input
+                  type="text"
+                  placeholder="Kraj/Miasto"
+                  value={filters.location}
+                  onChange={(e) => handleFilterChange("location", e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Cena do"
+                  value={filters.maxPrice}
+                  onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                />
+                <input
+                  type="date"
+                  value={filters.date}
+                  onChange={(e) => handleFilterChange("date", e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Liczba dni"
+                  value={filters.duration}
+                  onChange={(e) => handleFilterChange("duration", e.target.value)}
+                />
+                <input
+                  type="number"
+                  placeholder="Liczba szukanych osób"
+                  value={filters.maxPeople}
+                  onChange={(e) => handleFilterChange("maxPeople", e.target.value)}
+                />
+                <button className="save-filters-button" onClick={handleSaveFilters}>
+                  Szukaj
+                </button>
+              </div>
+            </>
           )}
         </div>
 
@@ -105,9 +199,10 @@ const HomePage = () => {
             />
           ) : (
             <div className="posts-container">
-              {posts.map((post) => (
+              {filteredPosts.map((post, index) => (
                 <div
                   key={post.id}
+                  ref={index === 0 ? newPostRef : null}
                   className={`post ${expandedPostId === post.id ? "expanded" : ""}`}
                   onClick={(e) => {
                     const selection = window.getSelection();
@@ -119,25 +214,15 @@ const HomePage = () => {
                 >
                   {user?.id === post.User?.id && (
                     <div
-                      className="delete-post-button"
+                      className="delete-post2-button"
                       title="Usuń post"
                       onClick={(e) => handleDeletePost(e, post.id)}
-                      style={{
-                        position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        cursor: "pointer",
-                        fontSize: "22px",
-                        color: "crimson",
-                        fontWeight: "bold",
-                        zIndex: 2,
-                      }}
                     >
                       ❌
                     </div>
                   )}
 
-                  <div className="post-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div className="post-header" style={{ display: "flex", justifyContent: "space-between" }}>
                     <div
                       className="user-info"
                       onClick={(e) => {
@@ -196,7 +281,7 @@ const HomePage = () => {
                   )}
 
                   <p className="post-meta">
-                    Wyjazd w dniu: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {Math.round(post.priceFrom)} - {Math.round(post.priceTo)} PLN | Miejsca: {post.maxPeople}
+                    Wyjazd w dniu: {new Date(post.travelDate).toLocaleDateString("pl-PL")} | Dni: {post.duration} | Cena: {Math.round(post.priceFrom)} - {Math.round(post.priceTo)} PLN | Liczba szukanych osób: {post.maxPeople}
                   </p>
                 </div>
               ))}

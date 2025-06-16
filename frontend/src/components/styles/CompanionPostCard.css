@@ -39,7 +39,7 @@
     top: 6px;
     right: 8px;
     font-size: 10px;
-    transform: scale(1.4); /* 👈 faktycznie zmniejsza wielkość nawet emoji */
+    transform: scale(1); /* 👈 faktycznie zmniejsza wielkość nawet emoji */
     color: crimson;
     font-weight: bold;
     cursor: pointer;
@@ -48,6 +48,6 @@
   }
   
   .delete-post1-button:hover {
-    transform: scale(1.6);
+    transform: scale(1.2);
   }
   

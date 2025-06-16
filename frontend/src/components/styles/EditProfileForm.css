@@ -4,12 +4,10 @@
   padding: 40px;
   box-sizing: border-box;
   overflow-y: auto;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   background: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -72,12 +70,12 @@
 }
 
 .edit-form-buttons button[type="submit"] {
-  background-color: #007bff;
+  background-color: #504f4f;
   color: white;
 }
 
 .edit-form-buttons button[type="submit"]:hover {
-  background-color: #0056b3;
+  background-color: #444;
 }
 
 .edit-form-buttons button[type="button"] {

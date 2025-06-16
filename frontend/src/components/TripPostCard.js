@@ -3,61 +3,86 @@ import "./styles/TripPostCard.css";
 import AuthContext from "../context/AuthContext";
 import axios from "axios";
 
-const TripPostCard = ({ post, onClick, onCommentClick }) => {
+/**
+ * TripPostCard
+ * ------------
+ * props:
+ *   post           – pełny obiekt posta
+ *   likes          – (opc.) liczba lajków przekazana z TripsPage
+ *   likedByMe      – (opc.) czy bieżący user polubił (z TripsPage)
+ *   onClick
+ *   onCommentClick
+ *   onUpdateLikes  – callback (postId, newLikeCount, likedFlag)  ← KOLEJNOŚĆ!
+ */
+const TripPostCard = ({
+  post,
+  likes,
+  likedByMe,
+  onClick,
+  onCommentClick,
+  onUpdateLikes,
+}) => {
   const {
     title,
     description,
     duration,
     price,
-    photos,
+    photos = [],
     createdAt,
     User: author,
     id: postId,
   } = post;
 
   const { user } = useContext(AuthContext);
+
+  /* ---------- LOCAL STATE ---------- */
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [likesCount, setLikesCount] = useState(0);
-  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount]               = useState(likes ?? 0);
+  const [liked,      setLiked]                    = useState(likedByMe ?? false);
+
   const isOwner = user?.id === author?.id;
 
+  /* ------ synchronizacja z props ------ */
+  useEffect(() => { setLikesCount(likes ?? 0); },   [likes]);
   useEffect(() => {
-    const fetchLikes = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/likes-count`);
-        const data = await res.json();
-        setLikesCount(data.count);
-      } catch (err) {
-        console.error("❌ Błąd pobierania lajków:", err);
-      }
-    };
+    if (likedByMe !== undefined) setLiked(!!likedByMe);
+  }, [likedByMe]);
 
-    const fetchLiked = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/liked`, {
-          headers: { Authorization: `Bearer ${user?.token}` },
-        });
-        const data = await res.json();
-        setLiked(data.liked);
-      } catch (err) {
-        console.error("❌ Błąd sprawdzania lajku:", err);
-      }
-    };
+  /* ------ fallback: pobranie z API (gdy TripsPage nie poda) ------ */
+  useEffect(() => {
+    if (likes === undefined) {
+      fetch(`http://localhost:5000/api/trip-posts/${postId}/likes-count`)
+        .then((r) => r.json())
+        .then(({ count }) => setLikesCount(count))
+        .catch((err) => console.error("❌ Błąd pobierania lajków:", err));
+    }
 
-    fetchLikes();
-    if (user) fetchLiked();
-  }, [postId, user]);
+    if (user && likedByMe === undefined) {
+      fetch(`http://localhost:5000/api/trip-posts/${postId}/liked`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+        .then((r) => r.json())
+        .then(({ liked }) => setLiked(liked))
+        .catch((err) => console.error("❌ Błąd sprawdzania lajku:", err));
+    }
+  }, [postId, user, likes, likedByMe]);
 
+  /* ---------- HANDLERY ---------- */
   const handleLike = async (e) => {
     e.stopPropagation();
     try {
-      const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/like`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const data = await res.json();
-      setLiked(data.liked);
-      setLikesCount((prev) => prev + (data.liked ? 1 : -1));
+      const res  = await fetch(
+        `http://localhost:5000/api/trip-posts/${postId}/like`,
+        { method: "POST", headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      const { liked: newLiked } = await res.json(); // { liked: boolean }
+
+      const newCount = likesCount + (newLiked ? 1 : -1);
+      setLiked(newLiked);
+      setLikesCount(newCount);
+
+      // 👉 informujemy TripsPage: (postId, newCount, newLiked)
+      onUpdateLikes?.(postId, newCount, newLiked);
     } catch (err) {
       console.error("❌ Błąd lajkowania:", err);
     }
@@ -65,8 +90,7 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
 
   const handleDelete = async (e) => {
     e.stopPropagation();
-    const confirmed = window.confirm("Czy na pewno chcesz usunąć ten post?");
-    if (!confirmed) return;
+    if (!window.confirm("Czy na pewno chcesz usunąć ten post?")) return;
 
     try {
       await axios.delete(`http://localhost:5000/api/trip-posts/${postId}`, {
@@ -79,65 +103,48 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
     }
   };
 
-  const handlePrev = () => {
-    setCurrentPhotoIndex((prev) => (prev === 0 ? photos.length - 1 : prev - 1));
-  };
+  const handlePrev = () =>
+    setCurrentPhotoIndex((i) => (i === 0 ? photos.length - 1 : i - 1));
+  const handleNext = () =>
+    setCurrentPhotoIndex((i) => (i === photos.length - 1 ? 0 : i + 1));
 
-  const handleNext = () => {
-    setCurrentPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
-  };
-
-  const handleClick = (e) => {
+  const handleCardClick = (e) => {
     const selection = window.getSelection();
-    const clickedEl = e.target;
-    const isControl = clickedEl.closest("button, .gallery-arrow, .dot, a");
-    const isSelecting = selection && selection.toString().length > 0;
-
-    if (!isControl && !isSelecting) {
-      onClick();
-    }
+    const clicked   = e.target;
+    const isCtrl    =
+      clicked.closest("button, .gallery-arrow, .dot, a") ||
+      (selection && selection.toString().length);
+    if (!isCtrl) onClick?.();
   };
 
+  /* ---------- RENDER ---------- */
   return (
-    <div className="trippost-card" onClick={handleClick} style={{ position: "relative" }}>
-  {isOwner && (
-    <div
-      className="delete-post-button"
-      title="Usuń post"
-      onClick={handleDelete}
-      style={{
-        position: "absolute",
-        top: "10px",
-        right: "10px",
-        cursor: "pointer",
-        fontSize: "22px",
-        color: "crimson",
-        fontWeight: "bold",
-        zIndex: 10, // może być więcej jeśli trzeba
-      }}
-    >
-      ❌
-    </div>
-  )}
+    <div className="trippost-card" onClick={handleCardClick}>
+      {isOwner && (
+        <div className="delete-post3-button" title="Usuń post" onClick={handleDelete}>
+          ❌
+        </div>
+      )}
 
-
+      {/* header */}
       <div className="trippost-header">
         <a href={`/profile/${author?.id}`} onClick={(e) => e.stopPropagation()}>
           <img
-            src={`http://localhost:5000/uploads/${author?.profilePicture || "default-profile.jpg"}`}
+            src={`http://localhost:5000/uploads/${
+              author?.profilePicture || "default-profile.jpg"
+            }`}
             alt="avatar"
             className="trippost-avatar"
           />
         </a>
-        <div className="trippost-author">
-          <span className="trippost-username">{author?.username}</span>
-        </div>
+        <span className="trippost-username">{author?.username}</span>
       </div>
 
       <h3 className="trippost-title">{title}</h3>
       <p className="trippost-description">{description}</p>
 
-      {Array.isArray(photos) && photos.length > 0 && (
+      {/* gallery */}
+      {!!photos.length && (
         <div className="trippost-gallery">
           <img
             src={`http://localhost:5000/uploads/${photos[currentPhotoIndex]}`}
@@ -146,10 +153,22 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
           />
           {photos.length > 1 && (
             <>
-              <button className="gallery-arrow left" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
+              <button
+                className="gallery-arrow left"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handlePrev();
+                }}
+              >
                 ‹
               </button>
-              <button className="gallery-arrow right" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
+              <button
+                className="gallery-arrow right"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNext();
+                }}
+              >
                 ›
               </button>
               <div className="gallery-dots">
@@ -169,12 +188,16 @@ const TripPostCard = ({ post, onClick, onCommentClick }) => {
         </div>
       )}
 
+      {/* meta */}
       <div className="trippost-meta">
         {duration && <span>Spędzonych dni: {duration}</span>}
         {price && <span>Koszt: {parseFloat(price)} PLN</span>} |{" "}
-        {createdAt && <span>Dodano: {new Date(createdAt).toLocaleDateString("pl-PL")}</span>}
+        {createdAt && (
+          <span>Dodano: {new Date(createdAt).toLocaleDateString("pl-PL")}</span>
+        )}
       </div>
 
+      {/* actions */}
       <div className="trippost-actions">
         <button
           className={`like-button ${liked ? "liked" : ""}`}

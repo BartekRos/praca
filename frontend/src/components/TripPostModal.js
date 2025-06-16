@@ -3,7 +3,7 @@ import "./styles/TripPostModal.css";
 import AuthContext from "../context/AuthContext";
 import TripCommentsSection from "./TripCommentsSection";
 
-const TripPostModal = ({ post, onClose }) => {
+const TripPostModal = ({ post, onClose, onUpdateLikes }) => {
   const {
     title,
     description,
@@ -11,6 +11,7 @@ const TripPostModal = ({ post, onClose }) => {
     duration,
     price,
     User: author,
+    id: postId,
   } = post;
 
   const [photoIndex, setPhotoIndex] = useState(0);
@@ -19,32 +20,28 @@ const TripPostModal = ({ post, onClose }) => {
   const [likesCount, setLikesCount] = useState(0);
   const [liked, setLiked] = useState(false);
 
-
   useEffect(() => {
-    // Zablokuj scrollowanie strony po otwarciu modala
     document.body.style.overflow = "hidden";
     return () => {
-      document.body.style.overflow = "auto"; // Przy zamknięciu odblokuj
+      document.body.style.overflow = "auto";
     };
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = "hidden";
-  
     const fetchLikes = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/trip-posts/${post.id}/likes-count`);
+        const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/likes-count`);
         const data = await res.json();
         setLikesCount(data.count);
       } catch (err) {
         console.error("❌ Błąd pobierania lajków:", err);
       }
     };
-  
+
     const fetchLiked = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/trip-posts/${post.id}/liked`, {
-          headers: { Authorization: `Bearer ${user.token}` },
+        const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/liked`, {
+          headers: { Authorization: `Bearer ${user?.token}` },
         });
         const data = await res.json();
         setLiked(data.liked);
@@ -52,14 +49,29 @@ const TripPostModal = ({ post, onClose }) => {
         console.error("❌ Błąd sprawdzania lajku:", err);
       }
     };
-  
+
     fetchLikes();
     if (user) fetchLiked();
+  }, [postId, user]);
+
+  const handleLike = async () => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/trip-posts/${postId}/like`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await res.json();
+      setLiked(data.liked);
+      const newCount = likesCount + (data.liked ? 1 : -1);
+      setLikesCount(newCount);
   
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [post.id, user]);
+      if (onUpdateLikes) {
+        onUpdateLikes(postId, newCount, data.liked); // ← przekazujemy liked!
+      }
+    } catch (err) {
+      console.error("❌ Błąd lajkowania:", err);
+    }
+  };
   
 
   const handlePrev = () => {
@@ -70,25 +82,9 @@ const TripPostModal = ({ post, onClose }) => {
     setPhotoIndex((prev) => (prev === photos.length - 1 ? 0 : prev + 1));
   };
 
-  const handleLike = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/trip-posts/${post.id}/like`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-      const data = await res.json();
-      setLiked(data.liked);
-      setLikesCount((prev) => prev + (data.liked ? 1 : -1));
-    } catch (err) {
-      console.error("❌ Błąd lajkowania:", err);
-    }
-  };
-  
-
   const handleBackdropClick = (e) => {
     const selection = window.getSelection();
     const clickedElement = e.target;
-
     const isArrow = clickedElement.closest(".modal-arrow");
     const isDot = clickedElement.closest(".dot");
     const isLikeOrComment = clickedElement.closest(".modal-actions button");
@@ -101,7 +97,6 @@ const TripPostModal = ({ post, onClose }) => {
     ) {
       return;
     }
-
     onClose();
   };
 
@@ -153,7 +148,6 @@ const TripPostModal = ({ post, onClose }) => {
           {/* Scrollowana zawartość */}
           <div className="modal-scrollable">
             <h2 className="modal-title">{title}</h2>
-
             <div className="modal-description">
               {description ? (
                 <>
@@ -170,7 +164,9 @@ const TripPostModal = ({ post, onClose }) => {
                   )}
                 </>
               ) : (
-                <p className="empty-description"><i>Brak opisu</i></p>
+                <p className="empty-description">
+                  <i>Brak opisu</i>
+                </p>
               )}
             </div>
 
@@ -180,7 +176,7 @@ const TripPostModal = ({ post, onClose }) => {
             </div>
 
             <div className="modal-comments">
-              <TripCommentsSection postId={post.id} postAuthorId={author?.id} />
+              <TripCommentsSection postId={postId} postAuthorId={author?.id} />
             </div>
           </div>
 

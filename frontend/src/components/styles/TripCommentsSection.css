@@ -107,15 +107,34 @@
     right: 8px;
     background: none;
     border: none;
-    font-size: 14px;
+    transform: scale(1);
+    font-size: 10px;
     cursor: pointer;
     color: #e53e3e;
+    transition: transform 0.15s ease;
   }
   
   .delete-button:hover {
     transform: scale(1.2);
   }
   
+  .delete-post2-button {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 10px;
+    transform: scale(1); /* 👈 faktycznie zmniejsza wielkość nawet emoji */
+    color: crimson;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.15s ease;
+  }
+  
+  .delete-post2-button:hover {
+    transform: scale(1.2);
+  }
+
   /* Pole do wpisywania nowego komentarza */
   .comment-input {
     display: flex;
