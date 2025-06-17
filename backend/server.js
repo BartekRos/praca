@@ -38,6 +38,10 @@ GroupMessage.belongsTo(Chat, { foreignKey: 'chatId' });
 User.hasMany(GroupMessage, { foreignKey: 'senderId' });
 GroupMessage.belongsTo(User, { foreignKey: 'senderId' });
 
+Chat.belongsToMany(User, { through: ChatParticipant, as: 'participants', foreignKey: 'chatId' });
+User.belongsToMany(Chat, { through: ChatParticipant, as: 'chats',        foreignKey: 'userId' });
+
+
 
 require('./models/Users');
 require('./models/Post');

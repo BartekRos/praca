@@ -180,7 +180,7 @@ const TripPostModal = ({ post, onClose, onUpdateLikes }) => {
             </div>
           </div>
 
-          <div className="modal-actions">
+          <div className="modal-actions1">
             <button
               className={`like-button ${liked ? "liked" : ""}`}
               onClick={handleLike}

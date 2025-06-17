@@ -1,190 +1,184 @@
+/* ─────────────────────────────────────────────────────────── */
+/* 1.  ISTNIEJĄCE STYLE                                      */
+/* ─────────────────────────────────────────────────────────── */
 body.no-scroll {
   overflow: hidden !important;
   height: 100vh;
 }
 .messages-page {
-    display: flex;
-    height: calc(100vh - 80px);
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .sidebar {
-    width: 250px;
-    background: #f5f5f5;
-    border-right: 1px solid #ddd;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  
-  .conversation {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .conversation.active {
-    background-color: #f0f0f0;
-    font-weight: bold;
-  }
-  
-  .chat-window {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .empty-chat {
-    margin-top: 50px;
-    color: #777;
-    text-align: center;
-  }
-  
-  .message-view {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 20px;
-    overflow-y: auto;
-    height: 100%;
-    box-sizing: border-box;
-    margin-bottom: 50px;
-  }
-  
-  .messages-list {
-    flex-grow: 1;
-    overflow-y: auto;
-    margin-bottom: 20px;
-  }
-  
-  .my-message {
-    text-align: right;
-    background-color: #cce5ff;
-    padding: 8px 12px;
-    margin: 5px 0;
-    border-radius: 10px;
-  }
-  
-  .their-message {
-    text-align: left;
-    background-color: #f1f1f1;
-    padding: 8px 12px;
-    margin: 5px 0;
-    border-radius: 10px;
-  }
-  
-  .send-message {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .send-message input {
-    flex-grow: 1;
-    padding: 10px;
-  }
-  
-  .send-message button {
-    padding: 10px 20px;
-  }
-  
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  
-  .modal {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    width: 400px;
-    max-width: 90%;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-    position: relative;
-  }
-  
-  .modal h2 {
-    margin-top: 0;
-    font-size: 1.5rem;
-    text-align: center;
-  }
-  
-  .modal input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    margin: 15px 0;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-  }
-  
-  .modal .friend-checkbox {
-    margin: 5px 0;
-  }
-  
-  .modal .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px;
-  }
-  
-  .modal button {
-    flex: 1;
-    padding: 10px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 8px;
-    border: none;
-    transition: background-color 0.3s;
-  }
-  
-  .modal button.confirm {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .modal button.cancel {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .add-group-button {
-    background-color: #646566;
-    color: white;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border: none;
-    width: 100%;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .add-group-button:hover {
-    background-color: #343435;
-  }
-  
-  .group-chat-item {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .group-chat-item:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .avatar {
+  display: flex;
+  height: calc(100vh - 80px);
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar {
+  width: 250px;
+  background: #f5f5f5;
+  border-right: 1px solid #ddd;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.conversation {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.conversation.active {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.empty-chat {
+  margin-top: 50px;
+  color: #777;
+  text-align: center;
+}
+
+.message-view {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 20px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+  margin-bottom: 50px;
+}
+
+.messages-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.my-message {
+  text-align: right;
+  background-color: #cce5ff;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 10px;
+}
+
+.their-message {
+  text-align: left;
+  background-color: #f1f1f1;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 10px;
+}
+
+.send-message {
+  display: flex;
+  gap: 10px;
+}
+
+.send-message input {
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.send-message button {
+  padding: 10px 20px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.modal h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.modal input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 15px 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.modal .friend-checkbox {
+  margin: 5px 0;
+}
+
+.modal .modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.modal button {
+  flex: 1;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  border: none;
+  transition: background-color 0.3s;
+}
+
+
+.add-group-button {
+  background-color: #646566;
+  color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: none;
+  width: 100%;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.add-group-button:hover {
+  background-color: #343435;
+}
+
+.group-chat-item {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.group-chat-item:hover {
+  background-color: #f0f0f0;
+}
+
+.avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -301,4 +295,188 @@ body.no-scroll {
 
 .delete-btn:hover {
   transform: scale(1.03);
+}
+
+.system-message {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  margin: 8px 0;
+  font-size: 0.9rem;
+}
+
+/* ─────────────────────────────────────────────────────────── */
+/* 2.  NOWE STYLE: kafelki członków + kafelek „Dodaj”          */
+/* ─────────────────────────────────────────────────────────── */
+
+/* wiersz z kafelkami */
+.members-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 14px;
+}
+
+/* pojedynczy kafelek */
+.member-chip {
+  display: inline-flex;
+  align-items: center;
+  background: #e7e7e7;
+  border-radius: 16px;
+  padding: 4px 10px 4px 12px;
+  font-size: 0.9rem;
+  line-height: 1;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* ikona usuwania (widoczna tylko dla właściciela) */
+.member-chip .remove-icon {
+  margin-left: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.member-chip .remove-icon:hover {
+  color: #d40000;
+}
+
+/* kafelek-przycisk „Dodaj” */
+.member-chip.add {
+  margin-left:auto;
+  background: #646566;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 6px 14px;
+  transition: background-color 0.25s;
+}
+
+.member-chip.add:hover {
+  background: #343435;
+}
+/* ===== MODAL (tworzenie / zaproszenia) ===== */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  backdrop-filter:blur(4px) brightness(.8); /* lekki blur tła */
+  background:rgba(0,0,0,.4);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.modal{
+  width: min(420px, 90vw);
+  background:#fff;
+  border-radius:16px;
+  padding:28px 32px 24px;
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
+  font-family:'Inter',sans-serif;
+  position:relative;
+}
+
+.modal h3{
+  margin:0 0 18px;
+  font-size:22px;
+  font-weight:700;
+  text-align:center;
+}
+
+/* close X */
+.modal .close-x{
+  position:absolute;
+  top:14px;
+  right:14px;
+  background:none;
+  border:none;
+  font-size:20px;
+  color:#777;
+  cursor:pointer;
+  transition:transform .2s;
+}
+.modal .close-x:hover{ transform:scale(1.15); }
+
+/* input nazwy grupy */
+.modal input[type="text"]{
+  width:100%;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px 14px;
+  font-size:15px;
+  margin-bottom:16px;
+  transition:border-color .25s;
+}
+.modal input[type="text"]:focus{
+  border-color:#646566;
+  outline:none;
+}
+
+/* lista znajomych (checkboxy jako chipsy) */
+.friends-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:20px;
+  max-height:230px;
+  overflow-y:auto;
+}
+
+.friend-checkbox{
+  position:relative;
+  padding-left:28px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.friend-checkbox input{
+  position:absolute;
+  left:0;
+  top:3px;
+  width:18px;
+  height:18px;
+  accent-color:#646566;      /* ✅ kolor checkboksa */
+}
+
+.friend-checkbox::after{     /* tło-chip */
+  content:none !important;
+  display:none !important;
+  background:#f1f1f1;
+  border-radius:20px;
+  padding:4px 10px 4px 30px;
+  font-size:.9rem;
+  line-height:18px;
+  color:#333;
+  transition:background .25s;
+}
+.friend-checkbox:hover::after{ background:#e7e7e7; }
+
+/* przyciski potwierdź / anuluj */
+.modal-actions{
+  display:flex;
+  gap:12px;
+}
+
+.modal-actions button{
+  flex:1 1 50%;
+  border:none;
+  padding:10px 0;
+  font-size:15px;
+  font-weight:600;
+  border-radius:10px;
+  cursor:pointer;
+  transition:background-color .25s ease;
+}
+
+.modal-actions .confirm{
+  background:#646566;      /* ten sam szary co w reszcie UI */
+  color:#fff;
+}
+.modal-actions .confirm:not(:disabled):hover{
+  background:#343435;      /* ciemniejszy w hoverze */
+}
+.modal-actions .confirm:disabled{
+  background:#a9acad;      /* wyszarzone gdy nieaktywne */
 }

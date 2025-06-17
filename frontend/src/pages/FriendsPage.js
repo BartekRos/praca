@@ -146,7 +146,7 @@ const FriendsPage = () => {
             <h2>Wyniki wyszukiwania</h2>
             {searchResults.map(user => (
               <div key={user.id} className="friend-card">
-                <img src={`http://localhost:5000/uploads/${user.profilePicture}`} alt="Profilowe" />
+                <img src={`http://localhost:5000/uploads/${user.profilePicture||'default-profile.jpg'}`} alt="Profilowe" />
                 <div>
                   <strong>{user.name}</strong>
                   <p>{user.username}</p>
@@ -167,7 +167,7 @@ const FriendsPage = () => {
           ) : (
             requests.map(r => (
               <div key={r.id} className="friend-card">
-                <img src={`http://localhost:5000/uploads/${r.profilePicture}`} alt="Profilowe" />
+                <img src={`http://localhost:5000/uploads/${r.profilePicture||'default-profile.jpg'}`} alt="Profilowe" />
                 <div>
                   <strong>{r.name}</strong>
                   <p>{r.username}</p>
@@ -198,7 +198,7 @@ const FriendsPage = () => {
             .filter(f => f.name.toLowerCase().includes(friendSearch.toLowerCase()) || f.username.toLowerCase().includes(friendSearch.toLowerCase()))
             .map(f => (
               <div key={f.id} className="friend-card" style={{ position: 'relative' }}>
-                <img src={`http://localhost:5000/uploads/${f.profilePicture}`} alt="Profilowe" />
+                <img src={`http://localhost:5000/uploads/${f.profilePicture||'default-profile.jpg'}`} alt="Profilowe" />
                 <div>
                   <strong>{f.name}</strong>
                   <p>{f.username}</p>

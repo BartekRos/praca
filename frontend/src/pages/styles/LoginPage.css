@@ -1,4 +1,10 @@
 .login-container {
+  position: relative;
+  background-color: #faf8f4;
+  background-image: url('mapa.png');opacity: 1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;

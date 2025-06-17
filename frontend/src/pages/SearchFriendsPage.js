@@ -48,7 +48,7 @@ const SearchFriendsPage = () => {
         <div className="friends-list">
           {results.map(user => (
             <div key={user.id} className="friend-card">
-              <img src={`http://localhost:5000/uploads/${user.profilePicture}`} alt="Profilowe" />
+              <img src={`http://localhost:5000/uploads/${user.profilePicture||'default-profile.jpg'}`} alt="Profilowe" />
               <div>
                 <strong>{user.name}</strong>
                 <p>{user.username}</p>

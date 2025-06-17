@@ -8,40 +8,43 @@ import React, {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-import AuthContext     from "../context/AuthContext";
-import Navbar          from "../components/Navbar";
-import TripPostCard    from "../components/TripPostCard";
-import TripPostModal   from "../components/TripPostModal";
+import AuthContext       from "../context/AuthContext";
+import Navbar            from "../components/Navbar";
+import TripPostCard      from "../components/TripPostCard";
+import TripPostModal     from "../components/TripPostModal";
 import CompanionPostCard from "../components/CompanionPostCard";
-import EditProfileForm from "../components/EditProfileForm";
+import EditProfileForm   from "../components/EditProfileForm";
 
 import planeIcon  from "../assets/icons/plane.png";
 import cameraIcon from "../assets/icons/camera.png";
 import "./styles/UserProfilePage.css";
 
 const ProfilePage = () => {
-  const { user, setUser } = useContext(AuthContext);
+  // ────────────────────────────────────────────────────────────
+  // pobieramy login / logout zamiast setUser (patrz EditProfile)
+  const { user, login, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  /* ---------- STAN ---------- */
-  const [profile,         setProfile]         = useState(null);
-  const [activeTab,       setActiveTab]       = useState("trip");
+  // ──────────────── STAN ────────────────
+  const [profile,        setProfile]        = useState(null);
+  const [activeTab,      setActiveTab]      = useState("trip");
 
-  const [tripPosts,       setTripPosts]       = useState([]);
-  const [companionPosts,  setCompanionPosts]  = useState([]);
+  const [tripPosts,      setTripPosts]      = useState([]);
+  const [companionPosts, setCompanionPosts] = useState([]);
 
-  const [likeCounts,      setLikeCounts]      = useState({});
+  const [likeCounts,     setLikeCounts]     = useState({});
 
-  const [selectedPost,    setSelectedPost]    = useState(null);
-  const [scrollToComments,setScrollToComments]= useState(false);
+  const [selectedPost,   setSelectedPost]   = useState(null);
+  const [scrollToComments, setScrollToComments] = useState(false);
 
-  const [showEditModal,   setShowEditModal]   = useState(false);
+  const [showEditModal,  setShowEditModal]  = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword,  setDeletePassword]  = useState("");
   const [deleteError,     setDeleteError]     = useState("");
+  const [isDeleting,      setIsDeleting]      = useState(false);
 
-  /* ========== POBIERANIE PROFILU ========== */
+  // ═══════════════ POBIERANIE PROFILU ═══════════════
   const fetchProfile = useCallback(async () => {
     try {
       const { data } = await axios.get(
@@ -54,28 +57,26 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  /* ========== POBIERANIE POSTÓW ========== */
+  // ═══════════════ POBIERANIE POSTÓW ═══════════════
   const fetchPosts = useCallback(async () => {
     try {
-      /* ---- Trip posts ---- */
+      // Trip-posty
       const { data: tripArr } = await axios.get(
         `/api/trip-posts/user/${user.id}`
       );
 
-      /* liczby lajków */
+      // liczniki lajków
       const countsArr = await Promise.all(
         tripArr.map(async (p) => {
-          const r = await axios.get(
-            `/api/trip-posts/${p.id}/likes-count`
-          );
+          const r = await axios.get(`/api/trip-posts/${p.id}/likes-count`);
           return { id: p.id, count: r.data.count };
         })
       );
       setLikeCounts(
-        countsArr.reduce((a, c) => ({ ...a, [c.id]: c.count }), {})
+        countsArr.reduce((acc, c) => ({ ...acc, [c.id]: c.count }), {})
       );
 
-      /* flaga likedByCurrentUser */
+      // flaga “lubię to”
       await Promise.all(
         tripArr.map(async (p) => {
           const r = await axios.get(
@@ -88,7 +89,7 @@ const ProfilePage = () => {
 
       setTripPosts(tripArr);
 
-      /* ---- Companion posts ---- */
+      // Companion-posty
       const { data: compArr } = await axios.get(
         `/api/posts?userId=${user.id}`
       );
@@ -98,14 +99,14 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  /* ------ INIT ------ */
+  // ─────────── INIT ───────────
   useEffect(() => {
     if (!user?.token) return;
     fetchProfile();
     fetchPosts();
   }, [user, fetchProfile, fetchPosts]);
 
-  /* ========== SYNCHRONIZACJA LAJKA ========== */
+  // ═══════════════ SYNC LAJKA ═══════════════
   const updatePostLike = (postId, newCount, liked) => {
     setLikeCounts((prev) => ({ ...prev, [postId]: newCount }));
 
@@ -115,36 +116,35 @@ const ProfilePage = () => {
       )
     );
 
-    // jeśli modal jest otwarty i dotyczy tego posta – też odśwież
     if (selectedPost?.id === postId) {
-      setSelectedPost((prev) => ({
-        ...prev,
-        likedByCurrentUser: liked,
-      }));
+      setSelectedPost((prev) => ({ ...prev, likedByCurrentUser: liked }));
     }
   };
 
-  /* ---------- blokada scrolla przy modal ---------- */
+  // blokada scrolla podczas otwartego modala z postem
   useEffect(() => {
     document.body.style.overflow = selectedPost ? "hidden" : "auto";
     return () => (document.body.style.overflow = "auto");
   }, [selectedPost]);
 
-  /* ========== RENDER ========== */
+  // ─────────── RENDER ───────────
   if (!profile) return <div>Ładowanie profilu...</div>;
 
   return (
     <>
       <Navbar />
 
+      {/* ───────────────────── STRONA PROFILU ───────────────────── */}
       <div className="profile-page">
-        {/* ---------- HEADER ---------- */}
+        {/* HEADER */}
         <div className="profile-header">
           <div className="bio-box">
-            <p><strong>Imię:</strong> {profile.name || "-"}</p>
-            <p><strong>Wiek:</strong> {profile.age || "-"}</p>
-            <p><strong>Miasto:</strong> {profile.city || "-"}</p>
-            <p><strong>Dołączył:</strong> {new Date(profile.createdAt).toLocaleDateString("pl-PL")}</p>
+            <p><strong>Imię:</strong>   {profile.name  || "-"}</p>
+            <p><strong>Wiek:</strong>   {profile.age   || "-"}</p>
+            <p><strong>Miasto:</strong> {profile.city  || "-"}</p>
+            <p><strong>Dołączył:</strong>{" "}
+              {new Date(profile.createdAt).toLocaleDateString("pl-PL")}
+            </p>
           </div>
 
           <div className="profile-avatar">
@@ -156,11 +156,19 @@ const ProfilePage = () => {
 
           <div className="profile-actions">
             <button onClick={() => setShowEditModal(true)}>Edytuj dane</button>
-            <button onClick={() => setShowDeleteModal(true)}>Usuń konto</button>
+            <button
+              onClick={() => {
+                setDeleteError("");
+                setDeletePassword("");
+                setShowDeleteModal(true);
+              }}
+            >
+              Usuń konto
+            </button>
           </div>
         </div>
 
-        {/* ---------- TABS ---------- */}
+        {/* TABS */}
         <div className="profile-tabs">
           <button
             className={activeTab === "trip" ? "active" : ""}
@@ -176,7 +184,7 @@ const ProfilePage = () => {
           </button>
         </div>
 
-        {/* ---------- CONTENT ---------- */}
+        {/* CONTENT */}
         <div className="profile-content">
           {activeTab === "trip" && (
             tripPosts.length ? (
@@ -208,7 +216,7 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* ---------- MODAL ---------- */}
+      {/* ───────────── MODAL: Trip-Post ───────────── */}
       {selectedPost && (
         <TripPostModal
           post            ={selectedPost}
@@ -218,7 +226,7 @@ const ProfilePage = () => {
         />
       )}
 
-      {/* ---------- DELETE MODAL ---------- */}
+      {/* ───────────── MODAL: DELETE ACCOUNT ───────────── */}
       {showDeleteModal && (
         <div className="modal-backdrop" onClick={() => setShowDeleteModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -232,11 +240,16 @@ const ProfilePage = () => {
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
               />
-              {deleteError && <p className="edit-message error">{deleteError}</p>}
+              {deleteError && (
+                <p className="edit-message error">{deleteError}</p>
+              )}
 
               <div className="edit-form-buttons">
                 <button
+                  disabled={isDeleting}
                   onClick={async () => {
+                    if (isDeleting) return;
+                    setIsDeleting(true);
                     try {
                       await axios.delete(
                         "http://localhost:5000/api/auth/delete-account",
@@ -245,38 +258,42 @@ const ProfilePage = () => {
                           data   : { password: deletePassword },
                         }
                       );
-                      localStorage.removeItem("user");
-                      setUser(null);
+                      logout();            // wyloguj i wyczyść storage
                       navigate("/login");
                     } catch (err) {
                       setDeleteError(
                         err?.response?.data?.message ||
                           "Błąd podczas usuwania konta"
                       );
+                    } finally {
+                      setIsDeleting(false);
                     }
                   }}
                 >
-                  Potwierdź usunięcie
+                  {isDeleting ? "Usuwam…" : "Potwierdź usunięcie"}
                 </button>
-                <button onClick={() => setShowDeleteModal(false)}>Anuluj</button>
+                <button onClick={() => setShowDeleteModal(false)}>
+                  Anuluj
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ---------- EDIT MODAL ---------- */}
+      {/* ───────────── MODAL: EDIT PROFILE ───────────── */}
       {showEditModal && (
         <div className="modal-backdrop" onClick={() => setShowEditModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <EditProfileForm
               onClose={() => {
                 setShowEditModal(false);
-                fetchProfile();                 // odśwież dane profilu
+                fetchProfile();           // odśwież dane po zapisie
               }}
               onProfileUpdated={(updated) => {
-                setProfile(updated);
-                setUser((prev) => ({ ...prev, ...updated }));
+                // aktualizujemy kontekst przez login()
+                login({ ...user, ...updated }, user.token);
+                setProfile((prev) => ({ ...prev, ...updated }));
               }}
             />
           </div>

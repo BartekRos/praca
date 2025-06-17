@@ -1,70 +1,92 @@
+// src/components/EditProfileForm.js
 import React, { useState, useContext } from "react";
-import axios from "axios";
-import cities from "../utils/cities";
+import axios          from "axios";
+import cities         from "../utils/cities";
+import AuthContext    from "../context/AuthContext";
 import "./styles/EditProfileForm.css";
-import AuthContext from "../context/AuthContext";
+
+const API = "http://localhost:5000/api";
 
 const EditProfileForm = ({ onClose, onProfileUpdated }) => {
-  const { user, setUser } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    age: "",
-    city: "",
-    currentPassword: "",
-    newPassword: "",
-    profilePicture: null,
-  });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const { user, login } = useContext(AuthContext);
 
+  const [formData, setFormData] = useState({
+    age:             user.age  || "",
+    city:            user.city || "",
+    currentPassword: "",
+    newPassword:     "",
+    profilePicture:  null,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [msg,     setMsg]     = useState("");
+
+  /* ---------- zmiany pól ---------- */
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "profilePicture") {
-      setFormData((prev) => ({ ...prev, profilePicture: files[0] }));
+      setFormData((p) => ({ ...p, profilePicture: files[0] || null }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((p) => ({ ...p, [name]: value }));
     }
   };
 
+  /* ---------- wysyłka ---------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setMessage("");
+    if (loading) return;
 
-    const data = new FormData();
-    data.append("currentPassword", formData.currentPassword);
-    if (formData.newPassword) data.append("newPassword", formData.newPassword);
-    if (formData.age) data.append("age", formData.age);
-    if (formData.city) data.append("city", formData.city);
-    if (formData.profilePicture) data.append("profilePicture", formData.profilePicture);
+    setLoading(true);
+    setMsg("");
+
+    const { age, city, currentPassword, newPassword, profilePicture } = formData;
+
+    let payload;
+    const headers = { Authorization: `Bearer ${user.token}` };
+
+    if (profilePicture) {
+      /* multipart (plik) */
+      payload = new FormData();
+      payload.append("currentPassword", currentPassword);
+      if (newPassword) payload.append("newPassword", newPassword);
+      if (age)         payload.append("age",  age);
+      if (city)        payload.append("city", city);
+      payload.append("profilePicture", profilePicture);
+      /* Content-Type ustawia przeglądarka */
+    } else {
+      /* JSON (bez pliku) */
+      payload = {
+        currentPassword,
+        newPassword : newPassword || undefined,
+        age         : age  || undefined,
+        city        : city || undefined,
+      };
+      headers["Content-Type"] = "application/json";
+    }
 
     try {
-      const response = await axios.put("http://localhost:5000/api/auth/update-profile", data, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
+      const res      = await axios.put(`${API}/auth/update-profile`, payload, { headers });
+      const updated  = res.data?.user;
 
-      const updatedUser = response.data?.user;
-      if (updatedUser) {
-        // Zapisz w localStorage i kontekście
-        localStorage.setItem("user", JSON.stringify({ ...user, ...updatedUser }));
-        setUser((prev) => ({ ...prev, ...updatedUser }));
-
-        if (onProfileUpdated) onProfileUpdated(updatedUser); // np. dla ProfilePage
-        setMessage("Dane zostały zaktualizowane.");
+      if (updated) {
+        /* odśwież kontekst i localStorage */
+        login({ ...user, ...updated }, user.token);
+        onProfileUpdated?.(updated);
         onClose();
       }
     } catch (err) {
       console.error("❌ Błąd aktualizacji profilu:", err);
-      setMessage(err?.response?.data?.message || "Wystąpił błąd.");
+      setMsg(err?.response?.data?.message || "Wystąpił błąd.");
     } finally {
       setLoading(false);
     }
   };
 
+  /* ---------- UI ---------- */
   return (
     <div className="edit-profile-form">
-      <h3>Edytuj dane</h3>
+      <h3>Edycja profilu</h3>
+
       <form onSubmit={handleSubmit}>
         <label>Nowe hasło:</label>
         <input
@@ -87,13 +109,18 @@ const EditProfileForm = ({ onClose, onProfileUpdated }) => {
         <label>Miasto:</label>
         <select name="city" value={formData.city} onChange={handleChange}>
           <option value="">Wybierz miasto</option>
-          {cities.map((city, index) => (
-            <option key={index} value={city}>{city}</option>
+          {cities.map((c, i) => (
+            <option key={i} value={c}>{c}</option>
           ))}
         </select>
 
         <label>Nowe zdjęcie profilowe:</label>
-        <input type="file" name="profilePicture" accept="image/*" onChange={handleChange} />
+        <input
+          type="file"
+          name="profilePicture"
+          accept="image/*"
+          onChange={handleChange}
+        />
 
         <label>Aktualne hasło (wymagane):</label>
         <input
@@ -104,11 +131,11 @@ const EditProfileForm = ({ onClose, onProfileUpdated }) => {
           required
         />
 
-        {message && <p className="edit-message">{message}</p>}
+        {msg && <p className="edit-message">{msg}</p>}
 
         <div className="edit-form-buttons">
           <button type="submit" disabled={loading}>
-            {loading ? "Zapisywanie..." : "Zapisz zmiany"}
+            {loading ? "Zapisywanie…" : "Zapisz zmiany"}
           </button>
           <button type="button" onClick={onClose}>Anuluj</button>
         </div>
